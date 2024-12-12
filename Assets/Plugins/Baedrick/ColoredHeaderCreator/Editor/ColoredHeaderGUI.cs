@@ -277,7 +277,7 @@ namespace Plugins.Baedrick.ColoredHeaderCreator.Editor
 			var presetAsset = (ColoredHeaderPreset)EditorGUIUtility.Load(path);
 			presetAsset.coloredHeaderPreset.Clear();
 
-			var headerComponents = FindObjectsOfType<ColoredHeader>();
+			var headerComponents = FindObjectsByType<ColoredHeader>(FindObjectsSortMode.None);
 			foreach (var headerComponent in headerComponents) {
 				var headerSettings = headerComponent.headerSettings;
 				var presetSettings = new HeaderSettings();

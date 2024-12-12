@@ -61,7 +61,7 @@ namespace Plugins.Baedrick.ColoredHeaderCreator.Editor
 		
 		public static void DeleteAllHeaders()
 		{
-			var headerComponents = Object.FindObjectsOfType<ColoredHeader>();
+            var headerComponents = Object.FindObjectsByType<ColoredHeader>(FindObjectsSortMode.None);
 			foreach (var headerComponent in headerComponents) {
 				if (headerComponent.transform.parent == null) {
 					headerComponent.transform.DetachChildren();
