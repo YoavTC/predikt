@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,20 +5,24 @@ public class ValidMoveCellsProjector : MonoBehaviour
 {
     private Cell[,] boardCells;
     private Cell lastCell;
+    private LayerMask cellLayerMask;
 
     [SerializeField] private Color targetedCellColor;
     [SerializeField] private Color validMoveCellsColor;
 
     private Camera mainCamera;
-    
-    public void OnBoardInitialized(Cell[,] initializedBoard)
-    {
-        boardCells = initializedBoard;
-    }
+    private Vector2 mousePosition;
 
     private void Start()
     {
         mainCamera = Camera.main;
+        
+        cellLayerMask = LayerMask.GetMask("Cell");
+    }
+    
+    public void OnBoardCellsInitialized(Cell[,] initializedBoard)
+    {
+        boardCells = initializedBoard;
     }
 
     private void Update()
@@ -33,30 +36,26 @@ public class ValidMoveCellsProjector : MonoBehaviour
 
     private void CheckMousePosition()
     {
-        // Cast a ray from the camera to the mouse position
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            
+        Collider2D hitCollider = Physics2D.OverlapPoint(mousePosition, cellLayerMask);
+        if (hitCollider != null && hitCollider.TryGetComponent(out Cell cell))
         {
-            // Check if the hit object is a cell
-            GameObject clickedObject = hit.collider.gameObject;
-            if (clickedObject.TryGetComponent(out Cell cell))
+            if (lastCell != null && lastCell == cell)
             {
-                if (lastCell != null && lastCell == cell)
-                {
-                    lastCell = null;
-                    return;
-                }
-                
-                Debug.Log(cell.name);
-                
-                lastCell = cell;
-                cell.Paint(targetedCellColor);
-                PaintValidMoveCells(cell);
+                lastCell = null;
+                return;
             }
+            
+            Debug.Log(cell.name);
+            
+            lastCell = cell;
+            cell.Paint(targetedCellColor);
+            PaintValidMoveCells(cell);
         }
     }
 
-    private List<Cell> GetValidMoveCells(Cell cell)
+    public List<Cell> GetValidMoveCells(Cell cell)
     {
         List<Cell> validMoveCells = new List<Cell>();
 
@@ -87,6 +86,7 @@ public class ValidMoveCellsProjector : MonoBehaviour
             }
         }
 
+        validMoveCells.Remove(cell);
         return validMoveCells;
     }
 
