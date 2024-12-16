@@ -15,7 +15,7 @@ public class Cell : MonoBehaviour
     
     private void GetComponents()
     {
-        spriteRenderer ??= GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     #region Cell Methods
@@ -27,6 +27,18 @@ public class Cell : MonoBehaviour
     public bool Compare(int _x, int _y)
     {
         return x == _x && y == _y;
+    }
+    #endregion
+
+    #region Occupying Circle
+    private Circle occupyingCircle;
+    
+    public bool IsOccupied() => occupyingCircle;
+    public Circle GetOccupyingCircle => occupyingCircle;
+    
+    public void UpdateOccupyingCircle(Circle circle = null)
+    {
+        occupyingCircle = circle;
     }
     #endregion
 

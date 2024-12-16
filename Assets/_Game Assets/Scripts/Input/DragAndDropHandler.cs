@@ -28,7 +28,7 @@ public class DragAndDropHandler : MonoBehaviour
     private void GetComponents()
     {
         circleLayerMask = LayerMask.GetMask("Circle");
-        mainCamera ??= Camera.main;
+        if (mainCamera == null) mainCamera = Camera.main;
     }
     
     private void HandleInput()
