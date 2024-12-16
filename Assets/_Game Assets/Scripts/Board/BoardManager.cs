@@ -6,15 +6,13 @@ using UnityEngine.Events;
 
 public class BoardManager : Singleton<BoardManager>
 {
-    [Header("Board Cells")]
-    [SerializeField] private Cell[] cells;
-    [SerializeField] private Cell[,] boardCells;
+    [Header("Board")]
+    private Cell[] cells;
+    private Cell[,] boardCells;
+    private const int BOARD_SIZE = 9;
     
     [Header("Components")]
     [SerializeField] private BoardCellsPainter boardCellsPainter;
-    
-    [Header("Board Settings")]
-    [SerializeField] private const int BOARD_SIZE = 9;
     
     [Header("Events")]
     public UnityEvent<List<Cell>> BoardCellsInitializedUnityEvent;
@@ -51,7 +49,7 @@ public class BoardManager : Singleton<BoardManager>
 
     private void GetComponents()
     {
-        if (!boardCellsPainter) boardCellsPainter = FindFirstObjectByType<BoardCellsPainter>();
+        if (boardCellsPainter == null) boardCellsPainter = FindFirstObjectByType<BoardCellsPainter>();
     }
     #endregion
 

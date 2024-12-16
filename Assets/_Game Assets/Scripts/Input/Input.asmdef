@@ -1,17 +1,4 @@
 {
     "name": "Input",
-    "rootNamespace": "",
-    "references": [
-        "GUID:e357ea8f6c6d4f719f18f0ad974c924f",
-        "GUID:7841e5d012ddd1d46ac6665a823bf83e"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+    "references":[ "External_Packages", "NaughtyAttributes.Core", "Board_Pieces"]
 }

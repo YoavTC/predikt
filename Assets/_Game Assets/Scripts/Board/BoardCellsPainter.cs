@@ -10,8 +10,8 @@ public class BoardCellsPainter : MonoBehaviour
     [SerializeField] private Color validColor, invalidColor;
     
     [Header("Board Cells")]
-    [SerializeField] private Cell lastCell;
-    [SerializeField] private List<Cell> allCells;
+    private Cell lastCell;
+    private List<Cell> allCells;
     
     [Preserve, UsedImplicitly]
     public void OnBoardCellsInitialized(List<Cell> initializedBoardCells)

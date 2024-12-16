@@ -1,16 +1,17 @@
-﻿using UnityEngine;
+﻿using NaughtyAttributes;
+using UnityEngine;
 using UnityEngine.Events;
 
 public class DragAndDropHandler : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] private Camera mainCamera;
-    [SerializeField] private int circleLayerMask;
+    [SerializeField] [ReadOnly] private int circleLayerMask;
 
     [Header("Dragging")]
-    [SerializeField] private Circle currentCircle;
-    [SerializeField] private DragInformation dragInformation;
-    [SerializeField] private Vector2 mousePosition;
+    [SerializeField] [ReadOnly] private Circle currentCircle;
+    [SerializeField] [ReadOnly] private DragInformation dragInformation;
+    [SerializeField] [ReadOnly] private Vector2 mousePosition;
     
     [Header("Events")]
     public UnityEvent<Cell> PickUpUnityEvent;
@@ -19,8 +20,8 @@ public class DragAndDropHandler : MonoBehaviour
     public UnityEvent<DragInformation> DropInvalidUnityEvent;
     
     [Header("Consts")]
-    [SerializeField] private const string VALID_DROP_LOCATION_MESSAGE = "Dropped at valid location. Moving.";
-    [SerializeField] private const string INVALID_DROP_LOCATION_MESSAGE = "Dropped at invalid location. Reverting.";
+    private const string VALID_DROP_LOCATION_MESSAGE = "Dropped at valid location. Moving.";
+    private const string INVALID_DROP_LOCATION_MESSAGE = "Dropped at invalid location. Reverting.";
     
     private void Start() => GetComponents();
     private void Update() => HandleInput();

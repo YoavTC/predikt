@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using NaughtyAttributes;
+using UnityEngine;
 
 public class Circle : MonoBehaviour
 {
-    [SerializeField] private Cell _currentCell;
+    [SerializeField] [ReadOnly] private Cell _currentCell;
     
     public Cell currentCell
     {

@@ -1,4 +1,4 @@
 ﻿{
   "name": "Board_Pieces",
-  "references":[ "External_Packages" ]
+  "references":[ "External_Packages", "NaughtyAttributes.Core" ]
 }

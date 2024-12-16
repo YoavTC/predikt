@@ -1,12 +1,13 @@
 ﻿using System;
+using NaughtyAttributes;
 using UnityEngine;
 
 [Serializable]
 public class Cell : MonoBehaviour
 {
     [Header("Coordinates")]
-    public int x;
-    public int y;
+    [ReadOnly] public int x;
+    [ReadOnly] public int y;
 
     [Header("Components")]
     [SerializeField] private SpriteRenderer spriteRenderer;
