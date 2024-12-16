@@ -2,15 +2,7 @@
 
 public class Circle : MonoBehaviour
 {
-    private Cell currentCell;
-    
-    public Cell GetCurrentCell()
-    {
-        if (currentCell != null) return currentCell;
-        
-        currentCell = BoardManager.Instance.GetCellFromCoords((int) transform.position.x, (int) transform.position.x);
-        return currentCell;
-    }
+    [SerializeField] private Cell currentCell;
     
     public void MoveToCell(Cell cell)
     {

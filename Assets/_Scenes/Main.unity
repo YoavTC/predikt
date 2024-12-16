@@ -2751,6 +2751,7 @@ GameObject:
   m_Component:
   - component: {fileID: 323508365}
   - component: {fileID: 323508366}
+  - component: {fileID: 323508367}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -2867,11 +2868,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6919188621061f340aef2f670cc7d6f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cells: []
+  boardCellsPainter: {fileID: 323508367}
   BoardCellsInitializedUnityEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1175010252}
-        m_TargetAssemblyTypeName: ValidMoveCellsProjector, Assembly-CSharp
+      - m_Target: {fileID: 323508367}
+        m_TargetAssemblyTypeName: BoardCellsPainter, Assembly-CSharp
         m_MethodName: OnBoardCellsInitialized
         m_Mode: 0
         m_Arguments:
@@ -2882,6 +2885,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &323508367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 323508363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d18a733101326840b595f1cf393e968, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  validColor: {r: 0.7028302, g: 1, b: 0.7028302, a: 1}
+  invalidColor: {r: 1, g: 0.740566, b: 0.740566, a: 1}
+  paintValidCellsOnly: 1
 --- !u!1 &333388219
 GameObject:
   m_ObjectHideFlags: 0
@@ -2973,6 +2991,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1298064177}
+  - {fileID: 1129038476}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &359815449
@@ -4285,7 +4304,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 557523646161054282, guid: b36f56590a6feb6429b2631d262c2d26, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 557523646161054282, guid: b36f56590a6feb6429b2631d262c2d26, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9028,12 +9047,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1129038473}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4, y: -4, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 333388222}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1175010251
 GameObject:
@@ -9044,9 +9063,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1175010253}
-  - component: {fileID: 1175010254}
   - component: {fileID: 1175010255}
-  - component: {fileID: 1175010252}
   m_Layer: 0
   m_Name: Input Manager
   m_TagString: Untagged
@@ -9054,20 +9071,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1175010252
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1175010251}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d18a733101326840b595f1cf393e968, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetedCellColor: {r: 1, g: 0, b: 0, a: 1}
-  validMoveCellsColor: {r: 1, g: 1, b: 0, a: 1}
 --- !u!4 &1175010253
 Transform:
   m_ObjectHideFlags: 0
@@ -9083,19 +9086,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1175010254
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1175010251}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3505f8e7c0a51204e900ac1efdc4510a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  selectedCircle: {fileID: 0}
 --- !u!114 &1175010255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9108,6 +9098,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968b3126f1d445f5832ec67e3e88eff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PickUpUnityEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 323508366}
+        m_TargetAssemblyTypeName: BoardManager, Assembly-CSharp
+        m_MethodName: PaintValidCells
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  MoveUnityEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  DropValidUnityEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 323508366}
+        m_TargetAssemblyTypeName: BoardManager, Assembly-CSharp
+        m_MethodName: ClearBoard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  DropInvalidUnityEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1215950837
 GameObject:
   m_ObjectHideFlags: 0
@@ -13565,7 +13591,6 @@ SceneRoots:
   - {fileID: 563960017}
   - {fileID: 333388222}
   - {fileID: 1175010253}
-  - {fileID: 1129038476}
   - {fileID: 1078755522}
   - {fileID: 323508365}
   - {fileID: 595897718}

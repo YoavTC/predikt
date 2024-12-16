@@ -1,24 +1,42 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
+[Serializable]
 public class Cell : MonoBehaviour
 {
+    [Header("Coordinates")]
     public int x;
     public int y;
 
-    public void Init(int x, int y)
+    [Header("Components")]
+    [SerializeField] private SpriteRenderer spriteRenderer;
+
+    private void Start() => GetComponents();
+    
+    private void GetComponents()
     {
-        this.x = x;
-        this.y = y;
-        Paint(Color.white);
+        spriteRenderer ??= GetComponent<SpriteRenderer>();
     }
 
+    #region Cell Methods
     public void Paint(Color color)
     {
-        GetComponent<SpriteRenderer>().color = color;
+        spriteRenderer.color = color;
     }
 
-    public bool Compare(int x, int y)
+    public bool Compare(int _x, int _y)
     {
-        return this.x == x && this.y == y;
+        return x == _x && y == _y;
     }
+    #endregion
+
+    #region Obsolete
+    [Obsolete("Used for cell generation. Keeping just in case")]
+    public void Init(int _x, int _y)
+    {
+        x = _x;
+        y = _y;
+        Paint(Color.white);
+    }
+    #endregion
 }

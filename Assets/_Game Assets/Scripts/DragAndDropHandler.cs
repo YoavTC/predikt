@@ -1,100 +1,91 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 public class DragAndDropHandler : MonoBehaviour
 {
-    private GameObject currentObject;
-    private Vector3 originalPosition;
+    [Header("Components")]
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private int circleLayerMask;
+
+    [Header("Dragging")]
+    [SerializeField] private Circle currentCircle;
+    [SerializeField] private DragInformation dragInformation;
+    [SerializeField] private Vector2 mousePosition;
     
-    private Camera mainCamera;
-    private int circleLayerMask;
-
-    private void Start()
-    {
-        GetComponents();
-    }
-
+    [Header("Events")]
+    public UnityEvent<Cell> PickUpUnityEvent;
+    public UnityEvent<DragInformation> MoveUnityEvent;
+    public UnityEvent<DragInformation> DropValidUnityEvent;
+    public UnityEvent<DragInformation> DropInvalidUnityEvent;
+    
+    [Header("Consts")]
+    [SerializeField] private const string VALID_DROP_LOCATION_MESSAGE = "Dropped at valid location. Moving.";
+    [SerializeField] private const string INVALID_DROP_LOCATION_MESSAGE = "Dropped at invalid location. Reverting.";
+    
+    private void Start() => GetComponents();
+    private void Update() => HandleInput();
+    
     private void GetComponents()
     {
         circleLayerMask = LayerMask.GetMask("Circle");
-        mainCamera = Camera.main;
+        mainCamera ??= Camera.main;
     }
-
-    void Update()
+    
+    private void HandleInput()
     {
         if (Input.GetMouseButtonDown(0)) TryPickUp();
-        else if (currentObject != null)
+        else if (currentCircle != null)
         {
             if (Input.GetMouseButton(0)) MoveObject();
-            else if (Input.GetMouseButtonUp(0)) DropObject();
+            else if (Input.GetMouseButtonUp(0)) DropObject(dragInformation);
         }
     }
 
     #region Drag & Dropping
     private void TryPickUp()
     {
-        Vector2 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition = GetMousePosition();
 
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, circleLayerMask);
-        if (hit.collider != null)
+        if (hit.collider?.TryGetComponent(out Circle hitCircle) == true)
         {
-            GameObject hitObject = hit.collider.gameObject;
-            if (hitObject.GetComponent<Circle>() != null)
-            {
-                currentObject = hitObject;
-                originalPosition = currentObject.transform.position;
-                
-                OnPickUp(currentObject);
-            }
+            currentCircle = hitCircle;
+
+            dragInformation = new DragInformation(currentCircle);
+            PickUpUnityEvent?.Invoke(dragInformation._originalCell);
         }
     }
 
     private void MoveObject()
     {
-        Vector2 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        currentObject.transform.position = mousePosition;
+        mousePosition = GetMousePosition();
+        currentCircle.transform.position = mousePosition;
         
-        OnMove(currentObject, mousePosition);
+        dragInformation.UpdateTargetedCell();
+        MoveUnityEvent?.Invoke(dragInformation);
     }
 
-    private void DropObject()
+    private void DropObject(DragInformation eventData)
     {
-        bool isValid = IsValidDropLocation(currentObject);
-        if (!isValid)
+        bool validMove = eventData.IsValidMoveCell();
+        if (validMove)
         {
-            currentObject.transform.position = originalPosition;
+            currentCircle.MoveToCell(eventData.targetedCell);
+            DropValidUnityEvent?.Invoke(eventData);
+        } else {
+            currentCircle.MoveToCell(eventData._originalCell);
+            DropInvalidUnityEvent?.Invoke(eventData);
         }
-
-        OnDrop(currentObject, isValid);
-        currentObject = null;
-    }
-    
-    private bool IsValidDropLocation(GameObject obj)
-    {
-        return true;
+        
+        Debug.Log(validMove ? VALID_DROP_LOCATION_MESSAGE : INVALID_DROP_LOCATION_MESSAGE);
+        currentCircle = null;
     }
     #endregion
 
-    #region Callbacks
-    private void OnPickUp(GameObject obj)
+    #region Utility
+    private Vector2 GetMousePosition()
     {
-        
-    }
-
-    private void OnMove(GameObject obj, Vector2 pos)
-    {
-        
-    }
-
-    private void OnDrop(GameObject obj, bool isValid)
-    {
-        if (isValid)
-        {
-            Debug.Log($"Dropped {obj.name} at a valid location.");
-        }
-        else
-        {
-            Debug.Log($"Dropped {obj.name} at an invalid location. Reverting.");
-        }
+        return mainCamera.ScreenToWorldPoint(Input.mousePosition);
     }
     #endregion
 }
