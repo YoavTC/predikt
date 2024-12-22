@@ -12,7 +12,8 @@ public class BoardCellsPainter : MonoBehaviour
     [Header("Board Cells")]
     private Cell lastCell;
     private List<Cell> allCells;
-    
+    private ITurnPerformListener turnPerformListenerImplementation;
+
     [Preserve, UsedImplicitly]
     public void OnBoardCellsInitialized(List<Cell> initializedBoardCells)
     {

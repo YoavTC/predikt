@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -26,15 +25,18 @@ public class UIManager : MonoBehaviour
         if (dragAndDropHandler == null) dragAndDropHandler = DragAndDropHandler.Instance;
     }
 
+    #region UI Updating
     public void UpdateEnemyLockState(LockState lockState)
     {
         enemyLockStateImage.color = enemyLockStateColors[(int) lockState];
     }
 
+    // Called when the player moves a piece & causes a BoardState update
     public void OnBoardStateUpdated(BoardState boardState)
     {
         lockButton.interactable = boardState != initialBoardState;
     }
+    #endregion
 
     #region Button Click Listeners
     public void OnLockButtonPressed()
