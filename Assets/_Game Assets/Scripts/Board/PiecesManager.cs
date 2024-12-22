@@ -1,19 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PiecesDealer : MonoBehaviour
+public class PiecesManager : MonoBehaviour
 {
     [SerializeField] private Transform circlesParent;
 
     private List<Circle> blackCircles = new List<Circle>();
     private List<Circle> whiteCircles = new List<Circle>();
     
-    void Start()
-    {
-        GetPieces();
-    }
-
-    private void GetPieces()
+    public void GetPieces()
     {
         for (int i = 0; i < circlesParent.childCount; i++)
         {
@@ -21,8 +16,20 @@ public class PiecesDealer : MonoBehaviour
             {
                 if (circle.team == CircleTeam.BLACK) blackCircles.Add(circle);
                 else whiteCircles.Add(circle);
+                
+                circle.MoveToCell(BoardManager.Instance.GetCellFromCoords(
+                    (int)(circle.transform.position.x + 0.5f),
+                    (int)(circle.transform.position.y + 0.5f)));
             }
         }
+    }
+
+    public List<Circle> GetAllPieces()
+    {
+        List<Circle> allCircles = new List<Circle>();
+        allCircles.AddRange(blackCircles);
+        allCircles.AddRange(whiteCircles);
+        return allCircles;
     }
 
     public void DealPieces(bool isBlack)

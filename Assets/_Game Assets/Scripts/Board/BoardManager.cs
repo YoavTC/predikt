@@ -13,9 +13,17 @@ public class BoardManager : Singleton<BoardManager>
     
     [Header("Components")]
     [SerializeField] private BoardCellsPainter boardCellsPainter;
+    [SerializeField] private PiecesManager piecesManager;
     
     [Header("Events")]
     public UnityEvent<List<Cell>> BoardCellsInitializedUnityEvent;
+    public UnityEvent<BoardState> BoardStateUpdatedUnityEvent;
+
+    [Header("Board States")] 
+    [SerializeField] private BoardState currentBoardState;
+    [SerializeField] private BoardState lastBoardState;
+    [Space]
+    [SerializeField] private BoardState defaultBoardState;
     
     private void Start()
     {
@@ -24,6 +32,9 @@ public class BoardManager : Singleton<BoardManager>
         GetComponents();
         
         BoardCellsInitializedUnityEvent?.Invoke(cells.ToList());
+        
+        // Store initial board state
+        UpdateBoardState();
     }
 
     #region GetComponents Initialization
@@ -50,6 +61,43 @@ public class BoardManager : Singleton<BoardManager>
     private void GetComponents()
     {
         if (boardCellsPainter == null) boardCellsPainter = FindFirstObjectByType<BoardCellsPainter>();
+        if (piecesManager == null) piecesManager = FindFirstObjectByType<PiecesManager>();
+    }
+    #endregion
+
+    #region Board Methods
+    private void LoadBoardState(BoardState boardState)
+    {
+        lastBoardState = currentBoardState;
+        currentBoardState = boardState;
+
+        foreach (var circleCellPair in boardState.circleCellDictionary)
+        {
+            circleCellPair.Key.MoveToCell(circleCellPair.Value);
+        }
+        
+        BoardStateUpdatedUnityEvent?.Invoke(boardState);
+    }
+
+    public void UpdateBoardState()
+    {
+        if (currentBoardState != null)
+        {
+            lastBoardState = currentBoardState;
+        }
+        
+        currentBoardState = new BoardState(piecesManager.GetAllPieces());
+        BoardStateUpdatedUnityEvent?.Invoke(currentBoardState);
+    }
+
+    public void RestoreLastBoardState()
+    {
+        LoadBoardState(lastBoardState);
+    }
+
+    public void ResetBoardState()
+    {
+        LoadBoardState(defaultBoardState);
     }
     #endregion
 

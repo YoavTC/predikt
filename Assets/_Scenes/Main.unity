@@ -2962,7 +2962,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1101802267}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1744327208}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: OnUndoButtonPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &308590278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3279,12 +3291,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardCellsPainter: {fileID: 323508367}
+  piecesManager: {fileID: 1643333805}
   BoardCellsInitializedUnityEvent:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 323508367}
         m_TargetAssemblyTypeName: BoardCellsPainter, Assembly-CSharp
         m_MethodName: OnBoardCellsInitialized
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1643333805}
+        m_TargetAssemblyTypeName: PiecesManager, Board_Pieces
+        m_MethodName: GetPieces
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  BoardStateUpdatedUnityEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1744327208}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: OnBoardStateUpdated
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5937,7 +5977,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 862102757}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1744327208}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: OnLockButtonPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &699449477
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10229,6 +10281,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 0}
   circleLayerMask: 0
+  canDrag: 1
   currentCircle: {fileID: 0}
   dragInformation:
     targetedCell: {fileID: 0}
@@ -10260,7 +10313,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  MoveUnityEvent:
+  MoveDragUnityEvent:
     m_PersistentCalls:
       m_Calls: []
   DropValidUnityEvent:
@@ -10269,6 +10322,30 @@ MonoBehaviour:
       - m_Target: {fileID: 323508366}
         m_TargetAssemblyTypeName: BoardManager, Assembly-CSharp
         m_MethodName: ClearBoard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1175010255}
+        m_TargetAssemblyTypeName: DragAndDropHandler, Input
+        m_MethodName: ChangeInputState
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 323508366}
+        m_TargetAssemblyTypeName: BoardManager, Board_Pieces
+        m_MethodName: UpdateBoardState
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -12332,7 +12409,6 @@ GameObject:
   - component: {fileID: 1493556249}
   - component: {fileID: 1493556250}
   - component: {fileID: 1493556248}
-  - component: {fileID: 1493556251}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -12353,7 +12429,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  piecesDealer: {fileID: 1493556251}
+  piecesManager: {fileID: 1643333805}
+  uiManager: {fileID: 1744327208}
 --- !u!4 &1493556249
 Transform:
   m_ObjectHideFlags: 0
@@ -12394,19 +12471,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &1493556251
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1493556247}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12111edc23801234681718e00281dba7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  circlesParent: {fileID: 1643333804}
 --- !u!1 &1508139680
 GameObject:
   m_ObjectHideFlags: 0
@@ -13171,6 +13235,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1643333804}
+  - component: {fileID: 1643333805}
   m_Layer: 0
   m_Name: Pieces
   m_TagString: Untagged
@@ -13195,6 +13260,19 @@ Transform:
   - {fileID: 941878733}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1643333805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1643333803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12111edc23801234681718e00281dba7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  circlesParent: {fileID: 1643333804}
 --- !u!1 &1691387201
 GameObject:
   m_ObjectHideFlags: 0
@@ -13683,6 +13761,57 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1744327207
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1744327209}
+  - component: {fileID: 1744327208}
+  m_Layer: 0
+  m_Name: UI Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1744327208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1744327207}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48e27ff58b3e4b3998f0571ae0b78820, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dragAndDropHandler: {fileID: 0}
+  lockButton: {fileID: 699449476}
+  enemyLockStateImage: {fileID: 1787665398}
+  enemyLockStateColors:
+  - {r: 0.23529412, g: 0.23529412, b: 0.23529412, a: 1}
+  - {r: 0.8396226, g: 0.09109115, b: 0.09109115, a: 1}
+  - {r: 0.090196095, g: 0.8392157, b: 0.20644411, a: 1}
+--- !u!4 &1744327209
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1744327207}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1787665396
 GameObject:
   m_ObjectHideFlags: 0
@@ -16007,6 +16136,7 @@ SceneRoots:
   - {fileID: 755343243}
   - {fileID: 1712996108}
   - {fileID: 1493556249}
+  - {fileID: 1744327209}
   - {fileID: 1175010253}
   - {fileID: 563960017}
   - {fileID: 333388222}

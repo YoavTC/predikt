@@ -1,11 +1,13 @@
+using External_Packages;
 using JetBrains.Annotations;
 using Unity.Netcode;
 using UnityEngine;
 
-public class GameManager : NetworkBehaviour
+public class GameManager : NetworkSingleton<GameManager>
 {
     [Header("Components")] 
-    [SerializeField] private PiecesDealer piecesDealer;
+    [SerializeField] private PiecesManager piecesManager;
+    [SerializeField] private UIManager uiManager;
     
     void Start()
     {
@@ -14,7 +16,8 @@ public class GameManager : NetworkBehaviour
 
     private void GetComponents()
     {
-        if (piecesDealer == null) piecesDealer = GetComponent<PiecesDealer>();
+        if (piecesManager == null) piecesManager = GetComponent<PiecesManager>();
+        if (uiManager == null) uiManager = GetComponent<UIManager>();
     }
 
     // Call on server to enable start game button
@@ -27,8 +30,24 @@ public class GameManager : NetworkBehaviour
     [ClientRpc, UsedImplicitly]
     public void StartGameClientRpc()
     {
-        piecesDealer.DealPieces(IsHost);
+        piecesManager.DealPieces(IsHost);
         Debug.Log($"[{OwnerClientId}] Dealing pieces Client RPC...");
         Debug.Log($"[{OwnerClientId}] I am{(IsHost ? "" : " not")} host!");
+    }
+    
+    public void LocalPlayerLockMove()
+    {
+        PlayerLockMoveClientRpc(OwnerClientId);
+    }
+
+    [ClientRpc]
+    private void PlayerLockMoveClientRpc(ulong clientID)
+    {
+        Debug.Log(clientID == OwnerClientId ?
+            "Announcement from myself, skipping!":
+            "Other player!!");
+        if (clientID == OwnerClientId) return;
+        
+        uiManager.UpdateEnemyLockState(LockState.LOCKED);
     }
 }

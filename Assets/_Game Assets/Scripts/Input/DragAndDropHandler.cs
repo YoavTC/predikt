@@ -1,21 +1,23 @@
-﻿using NaughtyAttributes;
+﻿using External_Packages;
+using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class DragAndDropHandler : MonoBehaviour
+public class DragAndDropHandler : Singleton<DragAndDropHandler>
 {
     [Header("Components")]
     [SerializeField] private Camera mainCamera;
     [SerializeField] [ReadOnly] private int circleLayerMask;
 
-    [Header("Dragging")]
+    [Header("Dragging")] 
+    [SerializeField] [ReadOnly] private bool canDrag = true;
     [SerializeField] [ReadOnly] private Circle currentCircle;
     [SerializeField] [ReadOnly] private DragInformation dragInformation;
     [SerializeField] [ReadOnly] private Vector2 mousePosition;
     
     [Header("Events")]
     public UnityEvent<Cell> PickUpUnityEvent;
-    public UnityEvent<DragInformation> MoveUnityEvent;
+    public UnityEvent<DragInformation> MoveDragUnityEvent;
     public UnityEvent<DragInformation> DropValidUnityEvent;
     public UnityEvent<DragInformation> DropInvalidUnityEvent;
     
@@ -34,12 +36,19 @@ public class DragAndDropHandler : MonoBehaviour
     
     private void HandleInput()
     {
+        if (!canDrag) return;
+        
         if (Input.GetMouseButtonDown(0)) TryPickUp();
         else if (currentCircle != null)
         {
             if (Input.GetMouseButton(0)) MoveObject();
             else if (Input.GetMouseButtonUp(0)) DropObject(dragInformation);
         }
+    }
+
+    public void ChangeInputState(bool state)
+    {
+        canDrag = state;
     }
 
     #region Drag & Dropping
@@ -63,7 +72,7 @@ public class DragAndDropHandler : MonoBehaviour
         currentCircle.transform.position = mousePosition;
         
         dragInformation.UpdateTargetedCell();
-        MoveUnityEvent?.Invoke(dragInformation);
+        MoveDragUnityEvent?.Invoke(dragInformation);
     }
 
     private void DropObject(DragInformation eventData)
