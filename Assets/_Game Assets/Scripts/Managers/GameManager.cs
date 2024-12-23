@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,8 +18,12 @@ public class GameManager : NetworkSingleton<GameManager>
     private List<ITurnPerformListener> turnPerformListeners = new List<ITurnPerformListener>();
     
     [Header("Rpc")]
-    [SerializeField] [ReadOnly] private ulong localClientId;
-    [SerializeField] [ReadOnly] private ulong opponentClientId;
+    [SerializeField] [ReadOnly] private int _localClientId;
+    [SerializeField] [ReadOnly] private int _opponentClientId;
+    
+    private ulong localClientId;
+    private ulong opponentClientId;
+    
     private ClientRpcParams opponentRpcParams; // Default Rpc Send params to send only to other player
     
     private bool hostJoined = false;
@@ -62,6 +65,8 @@ public class GameManager : NetworkSingleton<GameManager>
                                                      // been spawned before triggering any Rpc methods
         
         localClientId = NetworkManager.Singleton.LocalClientId;
+        _localClientId = (int) localClientId;
+        
         RequestOpponentIdClientRpc(localClientId);
         
         Debug.Log($"[{localClientId}]: I joined the session!");
@@ -72,15 +77,17 @@ public class GameManager : NetworkSingleton<GameManager>
     // Gets the opponent's client ID,
     // and sets the default Rpc params
     [ClientRpc]
-    private void RequestOpponentIdClientRpc(ulong _opponentClientId)
+    private void RequestOpponentIdClientRpc(ulong _opponentId)
     {
         Debug.Log($"[{localClientId}]: RequestOpponentIdClientRpc");
         // Ensure it doesn't run on the same client that called it
-        if (localClientId == _opponentClientId) return;
+        if (localClientId == _opponentId) return;
         
         Debug.Log($"[{localClientId}]: Proceeding RequestOpponentIdClientRpc");
         
-        opponentClientId = _opponentClientId;
+        opponentClientId = _opponentId;
+        _opponentClientId = (int) opponentClientId;
+        
         opponentRpcParams = new ClientRpcParams
         {
             Send = new ClientRpcSendParams { TargetClientIds = new []{opponentClientId} }
