@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using External_Packages;
 using JetBrains.Annotations;
-using NaughtyAttributes;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -18,15 +17,9 @@ public class GameManager : NetworkSingleton<GameManager>
     private List<ITurnPerformListener> turnPerformListeners = new List<ITurnPerformListener>();
     
     [Header("Rpc")]
-    [SerializeField] [ReadOnly] private int _localClientId;
-    [SerializeField] [ReadOnly] private int _opponentClientId;
-    
     private ulong localClientId;
     private ulong opponentClientId;
-    
     private ClientRpcParams opponentRpcParams; // Default Rpc Send params to send only to other player
-    
-    private bool hostJoined = false;
     
     void Start()
     {
@@ -35,9 +28,7 @@ public class GameManager : NetworkSingleton<GameManager>
         
         NetworkManager.OnClientConnectedCallback += OnClientConnectedCallback;
     }
-
     
-
     #region Initializations
     private void GetComponents()
     {
@@ -53,58 +44,50 @@ public class GameManager : NetworkSingleton<GameManager>
     #endregion
 
     #region Network Joining & Initialization
-    private void OnClientConnectedCallback(ulong obj)
+    private void OnClientConnectedCallback(ulong connectedClientId)
     {
-        Debug.Log($"[{NetworkManager.LocalClientId}]: OnClientConnectedCallback: {obj}");
-        StartCoroutine(JoinSessionCoroutine());
+        StartCoroutine(JoinSessionCoroutine(connectedClientId));
     }
     
-    private IEnumerator JoinSessionCoroutine()
+    private IEnumerator JoinSessionCoroutine(ulong connectedClientId)
     {
-        yield return new WaitUntil(() => IsSpawned); // Small delay to ensure the NetworkObject has
-                                                     // been spawned before triggering any Rpc methods
-        
+        // Small delay to ensure the NetworkObject has
+        // been spawned before triggering any Rpc methods
+        yield return new WaitUntil(() => IsSpawned); 
         localClientId = NetworkManager.Singleton.LocalClientId;
-        _localClientId = (int) localClientId;
         
-        RequestOpponentIdClientRpc(localClientId);
-        
-        Debug.Log($"[{localClientId}]: I joined the session!");
-        
-        OnClientJoinSessionServerRpc();
+        Debug.Log($"Client {connectedClientId} has connected!");
+
+        if (connectedClientId != localClientId)
+        {
+            AllClientsAreConnectedClientRpc();
+        }
     }
-    
-    // Gets the opponent's client ID,
-    // and sets the default Rpc params
+
     [ClientRpc]
-    private void RequestOpponentIdClientRpc(ulong _opponentId)
+    private void AllClientsAreConnectedClientRpc()
     {
-        Debug.Log($"[{localClientId}]: RequestOpponentIdClientRpc");
-        // Ensure it doesn't run on the same client that called it
-        if (localClientId == _opponentId) return;
+        GetOpponentClientIdAndRpc();
         
-        Debug.Log($"[{localClientId}]: Proceeding RequestOpponentIdClientRpc");
+        Debug.Log("both have connected");
+        // Enable button and prepare board
+    }
+
+    private void GetOpponentClientIdAndRpc()
+    {
+        ulong[] connectedClientIds = NetworkManager.Singleton.ConnectedClientsIds
+            .Where(clientId => clientId != localClientId)
+            .ToArray();
         
-        opponentClientId = _opponentId;
-        _opponentClientId = (int) opponentClientId;
+        if (connectedClientIds.Length > 0)
+        {
+            opponentClientId = connectedClientIds[0];
+        }
         
         opponentRpcParams = new ClientRpcParams
         {
             Send = new ClientRpcSendParams { TargetClientIds = new []{opponentClientId} }
         };
-    }
-    
-    // Runs when a client joins the session
-    // (Including on session creation)
-    [ServerRpc(RequireOwnership = false)]
-    private void OnClientJoinSessionServerRpc()
-    {
-        Debug.Log($"[{localClientId}]: A client has joined the session!");
-
-        if (hostJoined)
-        {
-            Debug.Log($"[{localClientId}]: we can start now!");
-        } else hostJoined = true;
     }
     #endregion
 
