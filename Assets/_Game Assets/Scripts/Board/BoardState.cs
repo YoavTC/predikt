@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+// TODO: Serialize this class in the network
+
 [Serializable]
 public class BoardState
 {

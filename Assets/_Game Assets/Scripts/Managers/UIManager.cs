@@ -41,7 +41,7 @@ public class UIManager : MonoBehaviour
     #region Button Click Listeners
     public void OnLockButtonPressed()
     {
-        lockButton.interactable = false;
+        // lockButton.interactable = false;
         GameManager.Instance.LocalPlayerLockMove();
         dragAndDropHandler.ChangeInputState(false);
     }

@@ -66,7 +66,7 @@ public class BoardManager : Singleton<BoardManager>
     #endregion
 
     #region Board Methods
-    private void LoadBoardState(BoardState boardState)
+    public void LoadBoardState(BoardState boardState)
     {
         lastBoardState = currentBoardState;
         currentBoardState = boardState;
