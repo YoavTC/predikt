@@ -66,9 +66,9 @@ public class BoardManager : Singleton<BoardManager>
     #endregion
 
     #region Board Methods
-    public void LoadBoardState(BoardState boardState)
-    {
-        lastBoardState = currentBoardState;
+    // Updates the current board pieces
+    private void LoadBoard(BoardState boardState)
+    { 
         currentBoardState = boardState;
 
         foreach (var circleCellPair in boardState.circleCellDictionary)
@@ -79,6 +79,7 @@ public class BoardManager : Singleton<BoardManager>
         BoardStateUpdatedUnityEvent?.Invoke(boardState);
     }
 
+    // Called on move, updates the current board *state*.
     public void UpdateBoardState()
     {
         if (currentBoardState != null)
@@ -90,14 +91,16 @@ public class BoardManager : Singleton<BoardManager>
         BoardStateUpdatedUnityEvent?.Invoke(currentBoardState);
     }
 
-    public void RestoreLastBoardState()
+    // Undoes the last move action
+    public void RestoreLastBoard()
     {
-        LoadBoardState(lastBoardState);
+        LoadBoard(lastBoardState);
     }
 
-    public void ResetBoardState()
+    // Cleans up the board and loads the default board state
+    public void ResetBoard()
     {
-        LoadBoardState(defaultBoardState);
+        // LoadBoard(defaultBoardState);
     }
     #endregion
 

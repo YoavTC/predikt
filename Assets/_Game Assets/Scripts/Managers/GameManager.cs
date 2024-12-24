@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using External_Packages;
-using JetBrains.Annotations;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -58,7 +57,8 @@ public class GameManager : NetworkSingleton<GameManager>
         
         Debug.Log($"Client {connectedClientId} has connected!");
 
-        if (connectedClientId != localClientId)
+        // Called on the host when the opponent connects
+        if (IsHost && connectedClientId != localClientId)
         {
             AllClientsAreConnectedClientRpc();
         }
@@ -67,13 +67,15 @@ public class GameManager : NetworkSingleton<GameManager>
     [ClientRpc]
     private void AllClientsAreConnectedClientRpc()
     {
-        GetOpponentClientIdAndRpc();
+        GetOpponentIdAndRpcParams();
         
-        Debug.Log("both have connected");
         // Enable button and prepare board
+        uiManager.PrepareUI();
+        piecesManager.DealPieces(IsHost);
+        BoardManager.Instance.ResetBoard();
     }
 
-    private void GetOpponentClientIdAndRpc()
+    private void GetOpponentIdAndRpcParams()
     {
         ulong[] connectedClientIds = NetworkManager.Singleton.ConnectedClientsIds
             .Where(clientId => clientId != localClientId)
@@ -88,67 +90,73 @@ public class GameManager : NetworkSingleton<GameManager>
         {
             Send = new ClientRpcSendParams { TargetClientIds = new []{opponentClientId} }
         };
+        
+        Debug.Log($"[{localClientId}]: got opponent's ID: {opponentClientId}, and set Rpc params");
     }
     #endregion
 
-    [ClientRpc, UsedImplicitly]
-    public void StartGameClientRpc()
-    {
-        piecesManager.DealPieces(IsHost);
-    }
-
     #region Moves
-    //TODO: Remake lock state checking logic
-    
     private LockState localLockState;
     private LockState opponentLockState;
     
-    public void LocalPlayerLockMove()
+    // Called when the local client uses the "Lock" button
+    // (Called from UIManager's OnLockButtonPressed)
+    public void LockMove()
     {
         Debug.Log($"[{localClientId}]: Move locked! Notifying opponent..");
+        
         localLockState = LockState.LOCKED;
-        
-        OpponentLockMoveClientRpc(opponentRpcParams);
-        TryNextTurn();
+        ClientLockedMoveServerRpc(localClientId);
     }
 
+    // Received on server when any client locks their move
+    // and calls the client RPC method below
+    [ServerRpc(RequireOwnership = false)]
+    private void ClientLockedMoveServerRpc(ulong clientId)
+    {
+        Debug.Log("Server: Received ServerRpc, notifying clients..");
+        ClientLockedMoveClientRpc(clientId);
+    }
+    
+    // Called on every client from the server RPC method above
     [ClientRpc]
-    private void OpponentLockMoveClientRpc(ClientRpcParams rpcParams = default)
+    private void ClientLockedMoveClientRpc(ulong clientId)
     {
-        Debug.Log($"[{localClientId}]: Got lock notification!");
-        opponentLockState = LockState.LOCKED;
-        
-        uiManager.UpdateEnemyLockState(opponentLockState);
-        TryNextTurn();
-    }
-
-    private void TryNextTurn()
-    {
-        if (opponentLockState == LockState.LOCKED && 
-            localLockState == LockState.LOCKED) 
+        if (localClientId != clientId)
         {
-            StartCoroutine(NextTurnCountdown());
+            Debug.Log($"[{localClientId}]: Got lock notification!");
+            opponentLockState = LockState.LOCKED;
+            uiManager.UpdateEnemyLockState(opponentLockState);
+        } 
+        
+        if (opponentLockState == LockState.LOCKED && localLockState == LockState.LOCKED) 
+        {
+            Debug.Log("Both locked, starting next turn sequence");
+            StartCoroutine(NextTurnSequence());
         }
     }
 
-    private IEnumerator NextTurnCountdown()
+    private IEnumerator NextTurnSequence()
     {
-        for (int i = 0; i < 2; i++)
+        for (int i = 3; i > 0; i--)
         {
             Debug.Log($"{i}..");
             yield return new WaitForSeconds(1);
         }
         
-        // BoardManager.Instance.LoadBoardState();
+        // BoardManager.Instance.LoadBoard();
+        InvokeTurnPerformInterfaceCall();
+        
+        Debug.Log("Next turn sequence finished!");
     }
-    
     #endregion
     
+    // Invokes the TurnPerformed method on all ITurnPerformedListener inheritors
     private void InvokeTurnPerformInterfaceCall()
     {
-        foreach (var listener in turnPerformListeners)
+        for (int i = 0; i < turnPerformListeners.Count; i++)
         {
-            listener?.TurnPerformed();
+            turnPerformListeners[i]?.TurnPerformed();
         }
     }
 }

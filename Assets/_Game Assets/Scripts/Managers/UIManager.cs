@@ -25,6 +25,13 @@ public class UIManager : MonoBehaviour
         if (dragAndDropHandler == null) dragAndDropHandler = DragAndDropHandler.Instance;
     }
 
+    // Called when both the players connect to the session
+    public void PrepareUI()
+    {
+        UpdateEnemyLockState(LockState.PLAYING);
+    } 
+        
+        
     #region UI Updating
     public void UpdateEnemyLockState(LockState lockState)
     {
@@ -32,7 +39,7 @@ public class UIManager : MonoBehaviour
     }
 
     // Called when the player moves a piece & causes a BoardState update
-    public void OnBoardStateUpdated(BoardState boardState)
+    public void UpdateBoardState(BoardState boardState)
     {
         lockButton.interactable = boardState != initialBoardState;
     }
@@ -42,13 +49,13 @@ public class UIManager : MonoBehaviour
     public void OnLockButtonPressed()
     {
         // lockButton.interactable = false;
-        GameManager.Instance.LocalPlayerLockMove();
+        GameManager.Instance.LockMove();
         dragAndDropHandler.ChangeInputState(false);
     }
 
     public void OnUndoButtonPressed()
     {
-        BoardManager.Instance.RestoreLastBoardState();
+        BoardManager.Instance.RestoreLastBoard();
         dragAndDropHandler.ChangeInputState(true);
     }
     #endregion

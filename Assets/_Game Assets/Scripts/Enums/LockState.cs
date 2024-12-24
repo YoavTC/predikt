@@ -1,6 +1,5 @@
 ﻿public enum LockState
 {
-    EMPTY,
-    UNLOCKED,
+    PLAYING,
     LOCKED
 }
