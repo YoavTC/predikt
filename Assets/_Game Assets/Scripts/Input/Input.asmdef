@@ -1,4 +1,21 @@
 {
     "name": "Input",
-    "references":[ "External_Packages", "NaughtyAttributes.Core", "Board_Pieces", "Interfaces", "Enums"]
+    "rootNamespace": "",
+    "references": [
+        "External_Packages",
+        "NaughtyAttributes.Core",
+        "Board_Pieces",
+        "Interfaces",
+        "Enums",
+        "Unity.Netcode.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
