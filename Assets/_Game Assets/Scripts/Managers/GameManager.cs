@@ -98,30 +98,45 @@ public class GameManager : NetworkSingleton<GameManager>
     #region Moves
     private LockState localLockState;
     private LockState opponentLockState;
+
+    private MoveInformation localMoveInformation;
+    private MoveInformation opponentMoveInformation;
+    
+    public void UpdateMoveInformation(MoveInformation newMoveInformation)
+    {
+        localMoveInformation = newMoveInformation;
+    }
     
     // Called when the local client uses the "Lock" button
     // (Called from UIManager's OnLockButtonPressed)
     public void LockMove()
     {
         Debug.Log($"[{localClientId}]: Move locked! Notifying opponent..");
+
+        MoveInformationRPC moveInformationRPC = new MoveInformationRPC(localMoveInformation, localClientId);
         
         localLockState = LockState.LOCKED;
-        ClientLockedMoveServerRpc(localClientId);
+        ClientLockedMoveServerRpc(localClientId, moveInformationRPC);
     }
 
     // Received on server when any client locks their move
     // and calls the client RPC method below
     [ServerRpc(RequireOwnership = false)]
-    private void ClientLockedMoveServerRpc(ulong clientId)
+    private void ClientLockedMoveServerRpc(ulong clientId, MoveInformationRPC clientMoveInformationRpc)
     {
         Debug.Log("Server: Received ServerRpc, notifying clients..");
-        ClientLockedMoveClientRpc(clientId);
+        ClientLockedMoveClientRpc(clientId, clientMoveInformationRpc);
     }
     
     // Called on every client from the server RPC method above
     [ClientRpc]
-    private void ClientLockedMoveClientRpc(ulong clientId)
+    private void ClientLockedMoveClientRpc(ulong clientId, MoveInformationRPC clientMoveInformationRpc)
     {
+        if (clientMoveInformationRpc.clientId != localClientId)
+        {
+            opponentMoveInformation = new MoveInformation(clientMoveInformationRpc);
+        }
+        
         if (localClientId != clientId)
         {
             Debug.Log($"[{localClientId}]: Got lock notification!");
@@ -132,6 +147,10 @@ public class GameManager : NetworkSingleton<GameManager>
         if (opponentLockState == LockState.LOCKED && localLockState == LockState.LOCKED) 
         {
             Debug.Log("Both locked, starting next turn sequence");
+            
+            Debug.Log($"Opp: {opponentMoveInformation.circle.id} moved {opponentMoveInformation.originCell.name} -> {opponentMoveInformation.targetCell.name}");
+            
+            
             StartCoroutine(NextTurnSequence());
         }
     }

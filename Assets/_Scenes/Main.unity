@@ -2913,9 +2913,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  BoardStateUpdatedUnityEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &323508367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9486,7 +9483,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 0}
   circleLayerMask: 0
+  projectionCirclePrefab: {fileID: 6318780406530156853, guid: 8448d23c48f25374ca92119e6395d7e7, type: 3}
   canDrag: 1
+  isDragging: 0
+  currentMoveInformation:
+    circle: {fileID: 0}
+    originCell: {fileID: 0}
+    targetCell: {fileID: 0}
   currentCircle: {fileID: 0}
   mousePosition: {x: 0, y: 0}
   PickCircleUnityEvent:
@@ -9558,7 +9561,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-  projectionCirclePrefab: {fileID: 6318780406530156853, guid: 8448d23c48f25374ca92119e6395d7e7, type: 3}
+      - m_Target: {fileID: 4823755462025781981}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: UpdateMoveInformation
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!1 &1200453260
 GameObject:
   m_ObjectHideFlags: 0
@@ -14907,6 +14921,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   team: 1
+  id: 0
   _currentCell: {fileID: 0}
 --- !u!114 &6632349368624432266
 MonoBehaviour:
@@ -14921,6 +14936,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   team: 0
+  id: 0
   _currentCell: {fileID: 0}
 --- !u!4 &7612698475878465650
 Transform:
