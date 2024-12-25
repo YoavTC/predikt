@@ -12,9 +12,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Image enemyLockStateImage;
     [SerializeField] private Color[] enemyLockStateColors;
 
-    [Header("Board State")]
-    private BoardState initialBoardState; 
-
     private void Start()
     {
         GetComponents();
@@ -30,33 +27,23 @@ public class UIManager : MonoBehaviour
     {
         UpdateEnemyLockState(LockState.PLAYING);
     } 
-        
-        
-    #region UI Updating
+    
+    // UI updating
     public void UpdateEnemyLockState(LockState lockState)
     {
         enemyLockStateImage.color = enemyLockStateColors[(int) lockState];
     }
-
-    // Called when the player moves a piece & causes a BoardState update
-    public void UpdateBoardState(BoardState boardState)
+    
+    public void UpdateLockButtonState(bool state)
     {
-        lockButton.interactable = boardState != initialBoardState;
+        lockButton.interactable = state;
     }
-    #endregion
-
-    #region Button Click Listeners
+    
+    // UI listening
     public void OnLockButtonPressed()
     {
         // lockButton.interactable = false;
         GameManager.Instance.LockMove();
         dragAndDropHandler.ChangeInputState(false);
     }
-
-    public void OnUndoButtonPressed()
-    {
-        BoardManager.Instance.RestoreLastBoard();
-        dragAndDropHandler.ChangeInputState(true);
-    }
-    #endregion
 }

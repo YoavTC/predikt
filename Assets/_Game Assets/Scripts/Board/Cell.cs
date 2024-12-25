@@ -25,9 +25,14 @@ public class Cell : MonoBehaviour
         spriteRenderer.color = color;
     }
 
-    public bool Compare(int _x, int _y)
+    public bool Compare(Vector2Int cellCoords)
     {
-        return x == _x && y == _y;
+        return x == cellCoords.x && y == cellCoords.y;
+    }
+
+    public Vector2Int GetCoords()
+    {
+        return new Vector2Int(x, y);
     }
     #endregion
 

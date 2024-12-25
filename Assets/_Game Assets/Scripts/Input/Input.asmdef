@@ -1,4 +1,4 @@
 {
     "name": "Input",
-    "references":[ "External_Packages", "NaughtyAttributes.Core", "Board_Pieces"]
+    "references":[ "External_Packages", "NaughtyAttributes.Core", "Board_Pieces", "Interfaces", "Enums"]
 }

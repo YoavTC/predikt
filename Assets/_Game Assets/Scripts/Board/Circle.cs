@@ -4,6 +4,7 @@ using UnityEngine;
 public class Circle : MonoBehaviour
 {
     public CircleTeam team;
+    public int id;
     
     [SerializeField] [ReadOnly] private Cell _currentCell;
     

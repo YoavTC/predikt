@@ -1,4 +1,5 @@
-﻿using External_Packages;
+﻿using System.Collections.Generic;
+using External_Packages;
 using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,23 +8,23 @@ public class DragAndDropHandler : Singleton<DragAndDropHandler>
 {
     [Header("Components")]
     [SerializeField] private Camera mainCamera;
-    [SerializeField] [ReadOnly] private int circleLayerMask;
+    [SerializeField] private int circleLayerMask;
 
     [Header("Dragging")] 
+    [SerializeField] private ProjectionCircle projectionCirclePrefab;
+    private ProjectionCircle projectionCircle;
+    
     [SerializeField] [ReadOnly] private bool canDrag = true;
+    [SerializeField] [ReadOnly] private bool isDragging = false;
+    
+    [SerializeField] [ReadOnly] private MoveInformation currentMoveInformation;
     [SerializeField] [ReadOnly] private Circle currentCircle;
-    [SerializeField] [ReadOnly] private DragInformation dragInformation;
     [SerializeField] [ReadOnly] private Vector2 mousePosition;
     
     [Header("Events")]
-    public UnityEvent<Cell> PickUpUnityEvent;
-    public UnityEvent<DragInformation> MoveDragUnityEvent;
-    public UnityEvent<DragInformation> DropValidUnityEvent;
-    public UnityEvent<DragInformation> DropInvalidUnityEvent;
-    
-    [Header("Consts")]
-    private const string VALID_DROP_LOCATION_MESSAGE = "Dropped at valid location. Moving.";
-    private const string INVALID_DROP_LOCATION_MESSAGE = "Dropped at invalid location. Reverting.";
+    public UnityEvent<Cell> PickCircleUnityEvent;
+    public UnityEvent StopDragCircleUnityEvent;
+    public UnityEvent<MoveInformation> DropCircleUnityEvent;
     
     private void Start() => GetComponents();
     private void Update() => HandleInput();
@@ -39,18 +40,13 @@ public class DragAndDropHandler : Singleton<DragAndDropHandler>
         if (!canDrag) return;
         
         if (Input.GetMouseButtonDown(0)) TryPickUp();
-        else if (currentCircle != null)
+        else if (currentCircle != null && projectionCircle != null)
         {
-            if (Input.GetMouseButton(0)) MoveObject();
-            else if (Input.GetMouseButtonUp(0)) DropObject(dragInformation);
+            if (Input.GetMouseButton(0) && isDragging) MoveObject();
+            else if (Input.GetMouseButtonUp(0)) DropObject();
         }
     }
-
-    public void ChangeInputState(bool state)
-    {
-        canDrag = state;
-    }
-
+    
     #region Drag & Dropping
     private void TryPickUp()
     {
@@ -59,43 +55,65 @@ public class DragAndDropHandler : Singleton<DragAndDropHandler>
         RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, circleLayerMask);
         if (hit.collider?.TryGetComponent(out Circle hitCircle) == true)
         {
+            if (currentCircle != null)
+            {
+                ResetDrag();
+                if (currentCircle == hitCircle) return;
+            }
+
+            isDragging = true;
             currentCircle = hitCircle;
 
-            dragInformation = new DragInformation(currentCircle);
-            PickUpUnityEvent?.Invoke(dragInformation._originalCell);
+            projectionCircle = Instantiate(projectionCirclePrefab, currentCircle.transform.position, Quaternion.identity);
+            
+            PickCircleUnityEvent?.Invoke(currentCircle.currentCell);
         }
     }
 
     private void MoveObject()
     {
         mousePosition = GetMousePosition();
-        currentCircle.transform.position = mousePosition;
-        
-        dragInformation.UpdateTargetedCell();
-        MoveDragUnityEvent?.Invoke(dragInformation);
+        projectionCircle.MoveTo(mousePosition);
     }
 
-    private void DropObject(DragInformation eventData)
+    private void DropObject()
     {
-        bool validMove = eventData.IsValidMoveCell();
-        if (validMove)
-        {
-            currentCircle.MoveToCell(eventData.targetedCell);
-            DropValidUnityEvent?.Invoke(eventData);
-        } else {
-            currentCircle.MoveToCell(eventData._originalCell);
-            DropInvalidUnityEvent?.Invoke(eventData);
-        }
+        Vector2Int startCoords = projectionCircle.GetOriginalCoords();
+        Vector2Int dropCoords = projectionCircle.GetCurrentCoords();
         
-        Debug.Log(validMove ? VALID_DROP_LOCATION_MESSAGE : INVALID_DROP_LOCATION_MESSAGE);
+        Cell originCell = BoardManager.Instance.GetCellFromCoords(startCoords.x, startCoords.y);
+        Cell targetCell = BoardManager.Instance.GetCellFromCoords(dropCoords.x, dropCoords.y);
+
+        currentMoveInformation = new MoveInformation(currentCircle, originCell, targetCell);
+        StopDragCircleUnityEvent?.Invoke();
+
+        List<Cell> validCells = BoardManager.Instance.GetValidCellMoves(originCell);
+        if (validCells.Contains(targetCell))
+        {
+            DropCircleUnityEvent?.Invoke(currentMoveInformation);
+        }
+        else
+        {
+            ResetDrag();
+        }
+
+        isDragging = false;
+    }
+
+    private void ResetDrag()
+    {
+        Destroy(projectionCircle.gameObject);
         currentCircle = null;
     }
     #endregion
-
-    #region Utility
+    
+    public void ChangeInputState(bool state)
+    {
+        canDrag = state;
+    }
+    
     private Vector2 GetMousePosition()
     {
         return mainCamera.ScreenToWorldPoint(Input.mousePosition);
     }
-    #endregion
 }

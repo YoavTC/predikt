@@ -16,6 +16,8 @@ public class PiecesManager : MonoBehaviour
             {
                 if (circle.team == CircleTeam.BLACK) blackCircles.Add(circle);
                 else whiteCircles.Add(circle);
+
+                circle.id = i;
                 
                 circle.MoveToCell(BoardManager.Instance.GetCellFromCoords(
                     (int)(circle.transform.position.x + 0.5f),
@@ -30,6 +32,21 @@ public class PiecesManager : MonoBehaviour
         allCircles.AddRange(blackCircles);
         allCircles.AddRange(whiteCircles);
         return allCircles;
+    }
+
+    public Circle GetPieceWithID(int id)
+    {
+        foreach (var circle in blackCircles)
+        {
+            if (circle.id == id) return circle;
+        }
+        
+        foreach (var circle in whiteCircles)
+        {
+            if (circle.id == id) return circle;
+        }
+
+        return null;
     }
 
     public void DealPieces(bool isBlack)

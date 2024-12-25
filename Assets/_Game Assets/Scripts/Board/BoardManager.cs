@@ -17,13 +17,6 @@ public class BoardManager : Singleton<BoardManager>
     
     [Header("Events")]
     public UnityEvent<List<Cell>> BoardCellsInitializedUnityEvent;
-    public UnityEvent<BoardState> BoardStateUpdatedUnityEvent;
-
-    [Header("Board States")] 
-    [SerializeField] private BoardState currentBoardState;
-    [SerializeField] private BoardState lastBoardState;
-    [Space]
-    [SerializeField] private BoardState defaultBoardState;
     
     private void Start()
     {
@@ -34,7 +27,10 @@ public class BoardManager : Singleton<BoardManager>
         BoardCellsInitializedUnityEvent?.Invoke(cells.ToList());
         
         // Store initial board state
-        UpdateBoardState();
+    }
+    public void ResetBoard()
+    {
+        
     }
 
     #region GetComponents Initialization
@@ -65,51 +61,22 @@ public class BoardManager : Singleton<BoardManager>
     }
     #endregion
 
-    #region Board Methods
-    // Updates the current board pieces
-    private void LoadBoard(BoardState boardState)
-    { 
-        currentBoardState = boardState;
-
-        foreach (var circleCellPair in boardState.circleCellDictionary)
-        {
-            circleCellPair.Key.MoveToCell(circleCellPair.Value);
-        }
-        
-        BoardStateUpdatedUnityEvent?.Invoke(boardState);
-    }
-
-    // Called on move, updates the current board *state*.
-    public void UpdateBoardState()
-    {
-        if (currentBoardState != null)
-        {
-            lastBoardState = currentBoardState;
-        }
-        
-        currentBoardState = new BoardState(piecesManager.GetAllPieces());
-        BoardStateUpdatedUnityEvent?.Invoke(currentBoardState);
-    }
-
-    // Undoes the last move action
-    public void RestoreLastBoard()
-    {
-        LoadBoard(lastBoardState);
-    }
-
-    // Cleans up the board and loads the default board state
-    public void ResetBoard()
-    {
-        // LoadBoard(defaultBoardState);
-    }
-    #endregion
-
     #region Cell-Board Utility
+    public Circle GetCircleFromID(int id)
+    {
+        return piecesManager.GetPieceWithID(id);
+    }
+
     public Cell GetCellFromCoords(int x, int y)
+    {
+        return GetCellFromCoords(new Vector2Int(x, y));
+    }
+    
+    public Cell GetCellFromCoords(Vector2Int cellCoords)
     {
         for (int i = 0; i < cells.Length; i++)
         {
-            if (cells[i].Compare(x, y)) return cells[i];
+            if (cells[i].Compare(cellCoords)) return cells[i];
         }
 
         return null;
