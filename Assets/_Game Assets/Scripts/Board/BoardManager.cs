@@ -92,6 +92,27 @@ public class BoardManager : Singleton<BoardManager>
     {
         return cells.ToList();
     }
+
+    public (List<Cell>, List<Cell>) GetValidCellMoves(Cell cell, CircleTeam team)
+    {
+        List<Cell> validMoveCells = GetValidCellMoves(cell);
+        List<Cell> actualValidMoveCells = new List<Cell>();
+
+        for (int i = 0; i < validMoveCells.Count; i++)
+        {
+            if (validMoveCells[i].GetOccupyingCircle?.team != team)
+            {
+                actualValidMoveCells.Add(validMoveCells[i]);
+            }
+        }
+
+        for (int i = 0; i < actualValidMoveCells.Count; i++)
+        {
+            validMoveCells.Remove(actualValidMoveCells[i]);
+        }
+        
+        return (actualValidMoveCells, validMoveCells);
+    }
     
     public List<Cell> GetValidCellMoves(Cell cell)
     {

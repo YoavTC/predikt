@@ -8,8 +8,9 @@ public class BoardCellsPainter : MonoBehaviour
     [Header("Painter Settings")]
     [SerializeField] private bool paintValidCellsOnly;
     [SerializeField] private Color validColor, invalidColor;
-    
-    [Header("Board Cells")]
+
+    [Header("Board Cells")] 
+    [SerializeField] private float cellGapWidth;
     private Cell lastCell;
     private List<Cell> allCells;
     private ITurnPerformListener turnPerformListenerImplementation;
@@ -18,39 +19,30 @@ public class BoardCellsPainter : MonoBehaviour
     public void OnBoardCellsInitialized(List<Cell> initializedBoardCells)
     {
         allCells = initializedBoardCells;
-    }
 
-    // TODO: Implement this in an input class
-    // private void CheckMousePosition()
-    // {
-    //     mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-    //         
-    //     Collider2D hitCollider = Physics2D.OverlapPoint(mousePosition, cellLayerMask);
-    //     if (hitCollider != null && hitCollider.TryGetComponent(out Cell cell))
-    //     {
-    //         if (lastCell != null && lastCell == cell)
-    //         {
-    //             lastCell = null;
-    //             return;
-    //         }
-    //         
-    //         Debug.Log(cell.name);
-    //         
-    //         lastCell = cell;
-    //         PaintValidCells(cell);
-    //     }
-    // }
+        for (int i = 0; i < allCells.Count; i++)
+        {
+            allCells[i].transform.localScale = Vector3.one - (Vector3.one * cellGapWidth);
+        }
+    }
     
     /// Marked as internal to hide from inspector. Call "BoardManager.Instance.PaintValidCells" instead
     internal void PaintValidCells(Cell cell)
     {
-        List<Cell> validMoveCells = BoardManager.Instance.GetValidCellMoves(cell);
+        var validMoveCells = BoardManager.Instance.GetValidCellMoves(cell, cell.GetOccupyingCircle.team);
         allCells = BoardManager.Instance.GetAllCells();
         
         foreach (Cell tempCell in allCells)
         {
-            if (validMoveCells.Contains(tempCell)) tempCell.Paint(validColor);
-            else if (!paintValidCellsOnly) tempCell.Paint(invalidColor);
+            if (validMoveCells.Item1.Contains(tempCell))
+            {
+                tempCell.Paint(validColor);
+            }
+            
+            if (validMoveCells.Item2.Contains(tempCell))
+            {
+                tempCell.Paint(invalidColor);
+            }
         }
     }
 

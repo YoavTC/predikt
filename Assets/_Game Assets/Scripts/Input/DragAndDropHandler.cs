@@ -87,7 +87,7 @@ public class DragAndDropHandler : Singleton<DragAndDropHandler>
         currentMoveInformation = new MoveInformation(currentCircle, originCell, targetCell);
         StopDragCircleUnityEvent?.Invoke();
 
-        List<Cell> validCells = BoardManager.Instance.GetValidCellMoves(originCell);
+        List<Cell> validCells = BoardManager.Instance.GetValidCellMoves(originCell, currentCircle.team).Item1;
         if (validCells.Contains(targetCell))
         {
             DropCircleUnityEvent?.Invoke(currentMoveInformation);
