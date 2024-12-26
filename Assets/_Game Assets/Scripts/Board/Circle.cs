@@ -28,7 +28,7 @@ public class Circle : MonoBehaviour
     
     public void MoveToCell(Cell cell)
     {
-        if (currentCell != null)
+        if (currentCell != null && currentCell.GetOccupyingCircle == this)
         {
             currentCell.UpdateOccupyingCircle();
         }

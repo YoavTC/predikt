@@ -79,6 +79,7 @@ public class BoardManager : Singleton<BoardManager>
             if (cells[i].Compare(cellCoords)) return cells[i];
         }
 
+        Debug.Log($"Couldnt find cell from coords {cellCoords}");
         return null;
     }
 

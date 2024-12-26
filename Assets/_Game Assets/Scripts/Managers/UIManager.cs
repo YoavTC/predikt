@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour
+public class UIManager : MonoBehaviour, ITurnPerformListener
 {
     [Header("Components")] 
     [SerializeField] private DragAndDropHandler dragAndDropHandler;
@@ -21,12 +21,6 @@ public class UIManager : MonoBehaviour
     {
         if (dragAndDropHandler == null) dragAndDropHandler = DragAndDropHandler.Instance;
     }
-
-    // Called when both the players connect to the session
-    public void PrepareUI()
-    {
-        UpdateEnemyLockState(LockState.PLAYING);
-    } 
     
     // UI updating
     public void UpdateEnemyLockState(LockState lockState)
@@ -42,8 +36,14 @@ public class UIManager : MonoBehaviour
     // UI listening
     public void OnLockButtonPressed()
     {
-        // lockButton.interactable = false;
+        lockButton.interactable = false;
         GameManager.Instance.LockMove();
         dragAndDropHandler.ChangeInputState(false);
+    }
+
+    public void TurnPerformed()
+    {
+        UpdateLockButtonState(false);
+        UpdateEnemyLockState(LockState.PLAYING);
     }
 }

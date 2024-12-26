@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using External_Packages;
 using Unity.Netcode;
@@ -7,14 +6,11 @@ using UnityEngine;
 using WebSocketSharp;
 
 // public class GameManager : NetworkSingleton<GameManager>
-public class GameManager : NetworkSingleton<GameManager>
+public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
 {
     [Header("Components")] 
     [SerializeField] private PiecesManager piecesManager;
     [SerializeField] private UIManager uiManager;
-    
-    // List of MonoBehaviour classes inheriting from the ITurnPerformListener interface
-    private List<ITurnPerformListener> turnPerformListeners = new List<ITurnPerformListener>();
     
     [Header("Rpc")]
     private ulong localClientId;
@@ -24,8 +20,6 @@ public class GameManager : NetworkSingleton<GameManager>
     void Start()
     {
         GetComponents();
-        RegisterTurnPerformListeners();
-        
         NetworkManager.OnClientConnectedCallback += OnClientConnectedCallback;
     }
     
@@ -34,12 +28,6 @@ public class GameManager : NetworkSingleton<GameManager>
     {
         if (piecesManager == null) piecesManager = GetComponent<PiecesManager>();
         if (uiManager == null) uiManager = GetComponent<UIManager>();
-    }
-
-    private void RegisterTurnPerformListeners()
-    {
-        MonoBehaviour[] allMonoBehaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-        turnPerformListeners = allMonoBehaviours.OfType<ITurnPerformListener>().ToList();
     }
     #endregion
 
@@ -71,7 +59,7 @@ public class GameManager : NetworkSingleton<GameManager>
         GetOpponentIdAndRpcParams();
         
         // Enable button and prepare board
-        uiManager.PrepareUI();
+        uiManager.UpdateEnemyLockState(LockState.PLAYING);
         piecesManager.DealPieces(IsHost);
         BoardManager.Instance.ResetBoard();
     }
@@ -165,21 +153,11 @@ public class GameManager : NetworkSingleton<GameManager>
         }
         
         OperationResult operationResult = ApplyMovesOperation();
+        InvokeTurnPerformInterfaceCall(); 
+        
+        Debug.Log(">> TURN OVER");
         
         Debug.Log($"operation: {operationResult.message}");
-
-        if (operationResult.success)
-        {
-            // BoardManager.Instance.LoadBoard();
-            InvokeTurnPerformInterfaceCall(); 
-        }
-        else
-        {
-            // Revert
-            Debug.Log("Reverted");
-        }
-        
-        Debug.Log("Next turn sequence finished!");
     }
 
     private OperationResult ApplyMovesOperation()
@@ -196,11 +174,21 @@ public class GameManager : NetworkSingleton<GameManager>
 
         Circle opponentTargetCircle = opponentTargetCell.GetOccupyingCircle;
         Circle localTargetCircle = localTargetCell.GetOccupyingCircle;
-
+        
+        Debug.Log("-----------");
+        Debug.Log(opponentTargetCell);
+        Debug.Log(localTargetCell);
+        Debug.Log(opponentTargetCircle);
+        Debug.Log(localTargetCircle);
+        Debug.Log(opponentTargetCircle != localMoveInformation.circle);
+        Debug.Log(localTargetCircle != opponentMoveInformation.circle);
+        Debug.Log("-----------");
+        
         // Opponent kill circle
         if (opponentTargetCircle != null && opponentTargetCircle != localMoveInformation.circle)
         {
             operationResultMessage += "// Opponent killed your piece!";
+            // Debug.Log($">> {opponentMoveInformation.circle} KILL {opponentTargetCircle.id}");
             Destroy(opponentTargetCircle.gameObject);
         }
         
@@ -208,9 +196,13 @@ public class GameManager : NetworkSingleton<GameManager>
         if (localTargetCircle != null && localTargetCircle != opponentMoveInformation.circle)
         {
             operationResultMessage += "// You killed your opponent's piece!";
+            // Debug.Log($">> {localMoveInformation.circle} KILL {localTargetCircle.id}");
             Destroy(localTargetCircle.gameObject);
         }
 
+        Debug.Log($">> {localMoveInformation.circle} MOVED {localMoveInformation.originCell} -> {localMoveInformation.targetCell}");
+        Debug.Log($">> {opponentMoveInformation.circle} MOVED {opponentMoveInformation.originCell} -> {opponentMoveInformation.targetCell}");
+        
         if (operationResultMessage.IsNullOrEmpty())
         {
             operationResultMessage = "// Nothing happened!";
@@ -222,13 +214,26 @@ public class GameManager : NetworkSingleton<GameManager>
         return new OperationResult(true, operationResultMessage);
     }
     #endregion
-    
-    // Invokes the TurnPerformed method on all ITurnPerformedListener inheritors
+
+    #region Turn Calls
     private void InvokeTurnPerformInterfaceCall()
     {
-        for (int i = 0; i < turnPerformListeners.Count; i++)
+        MonoBehaviour[] allMonoBehaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+
+        // Loop through them and invoke the TurnPerformed method if they implement ITurnPerformListener
+        foreach (var monoBehaviour in allMonoBehaviours)
         {
-            turnPerformListeners[i]?.TurnPerformed();
+            if (monoBehaviour is ITurnPerformListener listener)
+            {
+                listener.TurnPerformed();
+            }
         }
     }
+
+    public void TurnPerformed()
+    {
+        localLockState = LockState.PLAYING;
+        opponentLockState = LockState.PLAYING;
+    }
+    #endregion
 }

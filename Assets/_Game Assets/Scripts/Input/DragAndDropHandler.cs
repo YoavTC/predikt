@@ -4,7 +4,7 @@ using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class DragAndDropHandler : Singleton<DragAndDropHandler>
+public class DragAndDropHandler : Singleton<DragAndDropHandler>, ITurnPerformListener
 {
     [Header("Components")]
     [SerializeField] private Camera mainCamera;
@@ -102,7 +102,7 @@ public class DragAndDropHandler : Singleton<DragAndDropHandler>
 
     private void ResetDrag()
     {
-        Destroy(projectionCircle.gameObject);
+        if (projectionCircle != null) Destroy(projectionCircle.gameObject);
         currentCircle = null;
     }
     #endregion
@@ -115,5 +115,10 @@ public class DragAndDropHandler : Singleton<DragAndDropHandler>
     private Vector2 GetMousePosition()
     {
         return mainCamera.ScreenToWorldPoint(Input.mousePosition);
+    }
+
+    public void TurnPerformed()
+    {
+        ChangeInputState(true);
     }
 }

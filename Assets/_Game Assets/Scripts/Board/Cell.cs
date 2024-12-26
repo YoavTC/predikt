@@ -37,7 +37,7 @@ public class Cell : MonoBehaviour
     #endregion
 
     #region Occupying Circle
-    private Circle occupyingCircle;
+    [SerializeField] private Circle occupyingCircle;
     
     public bool IsOccupied() => occupyingCircle;
     public Circle GetOccupyingCircle => occupyingCircle;

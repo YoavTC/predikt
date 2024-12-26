@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class ProjectionCircle : SnapToGridBase
+public class ProjectionCircle : SnapToGridBase, ITurnPerformListener
 {
     [SerializeField] private LineRenderer lineRenderer;
     [SerializeField] private float lineProjectionAnimationSpeed;
@@ -40,5 +40,10 @@ public class ProjectionCircle : SnapToGridBase
     public Vector2Int GetOriginalCoords()
     {
         return new Vector2Int((int) originalCoords.x, (int) originalCoords.y);
+    }
+
+    public void TurnPerformed()
+    {
+        Destroy(gameObject);
     }
 }
