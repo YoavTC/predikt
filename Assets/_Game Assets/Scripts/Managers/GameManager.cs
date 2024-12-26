@@ -164,12 +164,20 @@ public class GameManager : NetworkSingleton<GameManager>
             yield return new WaitForSeconds(1);
         }
         
-        OperationResult result = ApplyMovesOperation();
+        OperationResult operationResult = ApplyMovesOperation();
         
-        Debug.Log($"operation: {result.message}");
-        
-        // BoardManager.Instance.LoadBoard();
-        InvokeTurnPerformInterfaceCall();
+        Debug.Log($"operation: {operationResult.message}");
+
+        if (operationResult.success)
+        {
+            // BoardManager.Instance.LoadBoard();
+            InvokeTurnPerformInterfaceCall(); 
+        }
+        else
+        {
+            // Revert
+            Debug.Log("Reverted");
+        }
         
         Debug.Log("Next turn sequence finished!");
     }
