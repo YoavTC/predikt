@@ -17,11 +17,7 @@ public class PiecesManager : MonoBehaviour
                 if (circle.team == CircleTeam.BLACK) blackCircles.Add(circle);
                 else whiteCircles.Add(circle);
 
-                circle.id = i;
-                
-                circle.MoveToCell(BoardManager.Instance.GetCellFromCoords(
-                    (int)(circle.transform.position.x + 0.5f),
-                    (int)(circle.transform.position.y + 0.5f)));
+                circle.Init(i);
             }
         }
     }
