@@ -16,6 +16,11 @@ public class Circle : MonoBehaviour
     
     public void MoveToCell(Cell cell)
     {
+        if (currentCell != null)
+        {
+            currentCell.UpdateOccupyingCircle();
+        }
+        
         currentCell = cell;
         currentCell.UpdateOccupyingCircle(this);
         transform.position = new Vector3(cell.x, cell.y, 0);

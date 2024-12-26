@@ -4,6 +4,7 @@ using System.Linq;
 using External_Packages;
 using Unity.Netcode;
 using UnityEngine;
+using WebSocketSharp;
 
 // public class GameManager : NetworkSingleton<GameManager>
 public class GameManager : NetworkSingleton<GameManager>
@@ -163,10 +164,54 @@ public class GameManager : NetworkSingleton<GameManager>
             yield return new WaitForSeconds(1);
         }
         
+        OperationResult result = ApplyMovesOperation();
+        
+        Debug.Log($"operation: {result.message}");
+        
         // BoardManager.Instance.LoadBoard();
         InvokeTurnPerformInterfaceCall();
         
         Debug.Log("Next turn sequence finished!");
+    }
+
+    private OperationResult ApplyMovesOperation()
+    {
+        Cell opponentTargetCell = opponentMoveInformation.targetCell;
+        Cell localTargetCell = localMoveInformation.targetCell;
+
+        if (opponentTargetCell == localTargetCell)
+        {
+            return new OperationResult(false, "Both players moved to the same cell!");
+        }
+
+        string operationResultMessage = "";
+
+        Circle opponentTargetCircle = opponentTargetCell.GetOccupyingCircle;
+        Circle localTargetCircle = localTargetCell.GetOccupyingCircle;
+
+        // Opponent kill circle
+        if (opponentTargetCircle != null && opponentTargetCircle != localMoveInformation.circle)
+        {
+            operationResultMessage += "// Opponent killed your piece!";
+            Destroy(opponentTargetCircle.gameObject);
+        }
+        
+        // Local kill circle
+        if (localTargetCircle != null && localTargetCircle != opponentMoveInformation.circle)
+        {
+            operationResultMessage += "// You killed your opponent's piece!";
+            Destroy(localTargetCircle.gameObject);
+        }
+
+        if (operationResultMessage.IsNullOrEmpty())
+        {
+            operationResultMessage = "// Nothing happened!";
+        }
+        
+        opponentMoveInformation.circle.MoveToCell(opponentMoveInformation.targetCell);
+        localMoveInformation.circle.MoveToCell(localMoveInformation.targetCell);
+        
+        return new OperationResult(true, operationResultMessage);
     }
     #endregion
     
