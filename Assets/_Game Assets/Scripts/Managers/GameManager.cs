@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using External_Packages;
 using Unity.Netcode;
@@ -90,6 +91,8 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
 
     private MoveInformation localMoveInformation;
     private MoveInformation opponentMoveInformation;
+
+    private List<GameObject> toBeDestroyedPieces = new List<GameObject>();
     
     public void UpdateMoveInformation(MoveInformation newMoveInformation)
     {
@@ -175,29 +178,18 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
         Circle opponentTargetCircle = opponentTargetCell.GetOccupyingCircle;
         Circle localTargetCircle = localTargetCell.GetOccupyingCircle;
         
-        Debug.Log("-----------");
-        Debug.Log(opponentTargetCell);
-        Debug.Log(localTargetCell);
-        Debug.Log(opponentTargetCircle);
-        Debug.Log(localTargetCircle);
-        Debug.Log(opponentTargetCircle != localMoveInformation.circle);
-        Debug.Log(localTargetCircle != opponentMoveInformation.circle);
-        Debug.Log("-----------");
-        
         // Opponent kill circle
         if (opponentTargetCircle != null && opponentTargetCircle != localMoveInformation.circle)
         {
             operationResultMessage += "// Opponent killed your piece!";
-            // Debug.Log($">> {opponentMoveInformation.circle} KILL {opponentTargetCircle.id}");
-            Destroy(opponentTargetCircle.gameObject);
+            toBeDestroyedPieces.Add(opponentTargetCircle.gameObject);
         }
         
         // Local kill circle
         if (localTargetCircle != null && localTargetCircle != opponentMoveInformation.circle)
         {
             operationResultMessage += "// You killed your opponent's piece!";
-            // Debug.Log($">> {localMoveInformation.circle} KILL {localTargetCircle.id}");
-            Destroy(localTargetCircle.gameObject);
+            toBeDestroyedPieces.Add(localTargetCircle.gameObject);
         }
 
         Debug.Log($">> {localMoveInformation.circle} MOVED {localMoveInformation.originCell} -> {localMoveInformation.targetCell}");
@@ -209,9 +201,21 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
         }
         
         opponentMoveInformation.circle.MoveToCell(opponentMoveInformation.targetCell);
-        localMoveInformation.circle.MoveToCell(localMoveInformation.targetCell);
+        localMoveInformation.circle.MoveToCell(localMoveInformation.targetCell, true, DestroyPieces);
         
         return new OperationResult(true, operationResultMessage);
+    }
+
+    private void DestroyPieces()
+    {
+        Debug.Log("HETY");
+        foreach (var VARIABLE in toBeDestroyedPieces)
+        {
+            Debug.Log($"Destroying {VARIABLE}");
+            Destroy(VARIABLE);
+        }
+        
+        toBeDestroyedPieces.Clear();
     }
     #endregion
 

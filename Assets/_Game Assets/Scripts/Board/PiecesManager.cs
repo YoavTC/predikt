@@ -1,8 +1,13 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class PiecesManager : MonoBehaviour
 {
+    [Header("Move Animation Settings")] 
+    [SerializeField] private float moveAnimationDuration;
+    [SerializeField] private Ease moveAnimationEasing;
+    
     [SerializeField] private Transform circlesParent;
 
     private List<Circle> blackCircles = new List<Circle>();
@@ -17,7 +22,7 @@ public class PiecesManager : MonoBehaviour
                 if (circle.team == CircleTeam.BLACK) blackCircles.Add(circle);
                 else whiteCircles.Add(circle);
 
-                circle.Init(i);
+                circle.Init(i, moveAnimationDuration, moveAnimationEasing);
             }
         }
     }

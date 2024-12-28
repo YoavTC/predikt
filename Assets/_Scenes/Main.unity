@@ -12899,6 +12899,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12111edc23801234681718e00281dba7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveAnimationDuration: 1.25
+  moveAnimationEasing: 18
   circlesParent: {fileID: 1643333804}
 --- !u!1 &1691387201
 GameObject:
