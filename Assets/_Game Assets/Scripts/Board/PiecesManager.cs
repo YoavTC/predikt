@@ -22,7 +22,7 @@ public class PiecesManager : MonoBehaviour
                 if (circle.team == CircleTeam.BLACK) blackCircles.Add(circle);
                 else whiteCircles.Add(circle);
 
-                circle.Init(i, moveAnimationDuration, moveAnimationEasing);
+                circle.Init(i);
             }
         }
     }
