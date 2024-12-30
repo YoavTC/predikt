@@ -5,6 +5,7 @@ using External_Packages;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Playables;
 using WebSocketSharp;
 
 // public class GameManager : NetworkSingleton<GameManager>
@@ -30,8 +31,8 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
     #region Initializations
     private void GetComponents()
     {
-        if (piecesManager == null) piecesManager = GetComponent<PiecesManager>();
-        if (uiManager == null) uiManager = GetComponent<UIManager>();
+        if (piecesManager == null) piecesManager = FindFirstObjectByType<PiecesManager>();
+        if (uiManager == null) uiManager = FindFirstObjectByType<UIManager>();
     }
     #endregion
     
@@ -179,11 +180,7 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
 
     private IEnumerator NextTurnSequence()
     {
-        for (int i = 3; i > 0; i--)
-        {
-            Debug.Log($"{i}..");
-            yield return new WaitForSeconds(1);
-        }
+        yield return new WaitForSeconds(1);
         
         OperationResult operationResult = ApplyMovesOperation();
         InvokeTurnPerformInterfaceCall(); 
