@@ -14,7 +14,7 @@ public class DragAndDropHandler : Singleton<DragAndDropHandler>, ITurnPerformLis
     [SerializeField] private ProjectionCircle projectionCirclePrefab;
     private ProjectionCircle projectionCircle;
     
-    [SerializeField] [ReadOnly] private bool canDrag = true;
+    [SerializeField] private bool canDrag = true;
     [SerializeField] [ReadOnly] private bool isDragging = false;
     
     [SerializeField] [ReadOnly] private MoveInformation currentMoveInformation;

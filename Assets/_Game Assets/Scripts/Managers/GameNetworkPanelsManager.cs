@@ -25,19 +25,16 @@ public class GameNetworkPanelsManager : MonoBehaviour
         CameraExitGameFrame();
         
         yield return new WaitUntil(() => NetworkManager.Singleton != null);
-        
-        NetworkManager.Singleton.OnClientConnectedCallback += ClientConnectedCallback;
-        NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectedCallback;
     }
 
-    private void ClientConnectedCallback(ulong clientId)
+    public void ClientConnectedCallback(ulong clientId)
     {
         ToggleCanvasesVisibility(networkPanelCanvas, false);
         ToggleCanvasesVisibility(gamePanelCanvas, true);
         CameraEnterGameFrame();
     }
     
-    private void ClientDisconnectedCallback(ulong clientId)
+    public void ClientDisconnectedCallback(ulong clientId)
     {
         ToggleCanvasesVisibility(networkPanelCanvas, true);
         ToggleCanvasesVisibility(gamePanelCanvas, false);

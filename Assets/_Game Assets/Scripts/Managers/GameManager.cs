@@ -4,6 +4,7 @@ using System.Linq;
 using External_Packages;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
 using WebSocketSharp;
 
 // public class GameManager : NetworkSingleton<GameManager>
@@ -21,7 +22,9 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
     void Start()
     {
         GetComponents();
-        NetworkManager.OnClientConnectedCallback += OnClientConnectedCallback;
+        
+        NetworkManager.Singleton.OnClientConnectedCallback += ClientConnectedCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectedCallback;
     }
     
     #region Initializations
@@ -31,12 +34,38 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
         if (uiManager == null) uiManager = GetComponent<UIManager>();
     }
     #endregion
-
-    #region Network Joining & Initialization
-    private void OnClientConnectedCallback(ulong connectedClientId)
+    
+    #region Events
+    private void ClientConnectedCallback(ulong clientId)
     {
-        StartCoroutine(JoinSessionCoroutine(connectedClientId));
+        ClientConnectedUnityEvent?.Invoke(clientId);
+        if (clientId == NetworkManager.Singleton.LocalClientId)
+        {
+            LocalClientConnectedUnityEvent?.Invoke(clientId);
+        }
     }
+
+    private void ClientDisconnectedCallback(ulong clientId)
+    {
+        ClientDisconnectedUnityEvent?.Invoke(clientId);
+        if (clientId == NetworkManager.Singleton.LocalClientId)
+        {
+            LocalClientDisconnectedUnityEvent?.Invoke(clientId);
+        }
+    }
+    
+    [Header("Network Events")]
+    public UnityEvent<ulong> ClientConnectedUnityEvent;
+    public UnityEvent<ulong> ClientDisconnectedUnityEvent;
+    
+    public UnityEvent<ulong> LocalClientDisconnectedUnityEvent;
+    public UnityEvent<ulong> LocalClientConnectedUnityEvent;
+
+    public UnityEvent GameStartedUnityEvent;
+    #endregion
+
+    #region Network Joining
+    public void ClientJoinedSession(ulong clientId) => StartCoroutine(JoinSessionCoroutine(clientId));
     
     private IEnumerator JoinSessionCoroutine(ulong connectedClientId)
     {
@@ -60,6 +89,8 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
         GetOpponentIdAndRpcParams();
         
         // Enable button and prepare board
+        GameStartedUnityEvent?.Invoke();
+        
         uiManager.UpdateEnemyLockState(LockState.PLAYING);
         piecesManager.DealPieces(IsHost);
         BoardManager.Instance.ResetBoard();
