@@ -93,7 +93,6 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
         
         uiManager.UpdateEnemyLockState(LockState.PLAYING);
         piecesManager.DealPieces(IsHost);
-        BoardManager.Instance.ResetBoard();
     }
 
     private void GetOpponentIdAndRpcParams()

@@ -28,10 +28,6 @@ public class BoardManager : Singleton<BoardManager>
         
         // Store initial board state
     }
-    public void ResetBoard()
-    {
-        
-    }
 
     #region GetComponents Initialization
     private void GetCells()
