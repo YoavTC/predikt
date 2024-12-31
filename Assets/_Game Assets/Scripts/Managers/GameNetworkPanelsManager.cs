@@ -3,6 +3,7 @@ using System.Collections;
 using DG.Tweening;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class GameNetworkPanelsManager : MonoBehaviour
@@ -29,6 +30,8 @@ public class GameNetworkPanelsManager : MonoBehaviour
 
     public void ClientConnectedCallback(ulong clientId)
     {
+        EventSystem.current.SetSelectedGameObject(null);
+        
         ToggleCanvasesVisibility(networkPanelCanvas, false);
         ToggleCanvasesVisibility(gamePanelCanvas, true);
         CameraEnterGameFrame();
@@ -36,6 +39,8 @@ public class GameNetworkPanelsManager : MonoBehaviour
     
     public void ClientDisconnectedCallback(ulong clientId)
     {
+        EventSystem.current.SetSelectedGameObject(null);
+        
         ToggleCanvasesVisibility(networkPanelCanvas, true);
         ToggleCanvasesVisibility(gamePanelCanvas, false);
         CameraExitGameFrame();
@@ -63,10 +68,16 @@ public class GameNetworkPanelsManager : MonoBehaviour
     private void ToggleCanvasesVisibility(Canvas canvas, bool visible, float duration = 2f)
     {
         var children = canvas.GetComponentsInChildren<Graphic>();
+        var interactableChildren = canvas.GetComponentsInChildren<Button>();
 
         foreach (var child in children)
         {
             child.DOFade(visible ? 1f : 0f, duration);
+        }
+
+        foreach (var child in interactableChildren)
+        {
+            child.interactable = visible;
         }
 
         // StartCoroutine(ToggleCanvas(canvas, visible, duration));
