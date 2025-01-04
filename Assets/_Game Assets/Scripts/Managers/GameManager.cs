@@ -134,6 +134,8 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
     // (Called from UIManager's OnLockButtonPressed)
     public void LockMove()
     {
+        InvokeTurnLockInterfaceCall();
+        
         Debug.Log($"[{localClientId}]: Move locked! Notifying opponent..");
 
         MoveInformationRPC moveInformationRPC = new MoveInformationRPC(localMoveInformation, localClientId);
@@ -265,6 +267,20 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
     {
         localLockState = LockState.PLAYING;
         opponentLockState = LockState.PLAYING;
+    }
+
+    private void InvokeTurnLockInterfaceCall()
+    {
+        MonoBehaviour[] allMonoBehaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+
+        // Loop through them and invoke the TurnPerformed method if they implement ITurnPerformListener
+        foreach (var monoBehaviour in allMonoBehaviours)
+        {
+            if (monoBehaviour is ITurnLockListener listener)
+            {
+                listener.TurnLocked();
+            }
+        }
     }
     #endregion
 }

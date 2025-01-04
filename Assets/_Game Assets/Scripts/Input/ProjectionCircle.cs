@@ -1,12 +1,17 @@
 ﻿using System;
+using DG.Tweening;
 using UnityEngine;
 
-public class ProjectionCircle : SnapToGridBase, ITurnPerformListener
+public class ProjectionCircle : SnapToGridBase, ITurnPerformListener, ITurnLockListener
 {
     [SerializeField] private LineRenderer lineRenderer;
     [SerializeField] private float lineProjectionAnimationSpeed;
     private Vector2 originalCoords;
     private Material lineMaterial;
+
+    [SerializeField] private Color lineLockedColor;
+    [SerializeField] private Gradient lineLockedColorGradient;
+    private bool animate = true;
 
     private void Start()
     {
@@ -20,8 +25,11 @@ public class ProjectionCircle : SnapToGridBase, ITurnPerformListener
 
     private void Update()
     {
-        lineRenderer.material.mainTextureOffset -= new Vector2(lineProjectionAnimationSpeed * Time.deltaTime, 0f);
-        lineRenderer.material = lineMaterial;
+        if (animate)
+        {
+            lineRenderer.material.mainTextureOffset -= new Vector2(lineProjectionAnimationSpeed * Time.deltaTime, 0f);
+            lineRenderer.material = lineMaterial;
+        }
     }
 
     public override void MoveTo(Vector3 pos)
@@ -45,5 +53,15 @@ public class ProjectionCircle : SnapToGridBase, ITurnPerformListener
     public void TurnPerformed()
     {
         Destroy(gameObject);
+    }
+
+    public void TurnLocked()
+    {
+        animate = false;
+        
+        lineRenderer.colorGradient = lineLockedColorGradient;
+        lineRenderer.textureScale = new Vector2(0, 1);
+
+        GetComponent<SpriteRenderer>().color = lineLockedColor;
     }
 }
