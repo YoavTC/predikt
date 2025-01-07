@@ -1,5 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using DG.Tweening;
+using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
+using UnityEngine.Video;
 
 public class UIManager : MonoBehaviour, ITurnPerformListener
 {
@@ -11,6 +15,10 @@ public class UIManager : MonoBehaviour, ITurnPerformListener
     [Space]
     [SerializeField] private Image enemyLockStateImage;
     [SerializeField] private Color[] enemyLockStateColors;
+    
+    [Header("Main Menu Components")]
+    [SerializeField] private RectTransform howToPlayPopup;
+    [SerializeField] private VideoPlayer tutorialVideoPlayer;
 
     private void Start()
     {
@@ -46,4 +54,68 @@ public class UIManager : MonoBehaviour, ITurnPerformListener
         UpdateLockButtonState(false);
         UpdateEnemyLockState(LockState.PLAYING);
     }
+
+    #region Main Menu Buttons
+
+    public void OnQuitButtonPressed()
+    {
+        #if !UNITY_WEBGL
+        Application.Quit();   
+        #endif
+    }
+
+    public void OnAboutButtonPressed()
+    {
+        StartCoroutine(GetAboutPageCoroutine());
+    }
+
+    private readonly string[] possibleAboutUrls =
+    {
+        "https://yoavtc.work/projects/predikt/",
+        "https://yoavtc.work/projectsv2/predikt/",
+        "https://yoavtc.work/",
+        "https://github.com/YoavTC",
+        "https://www.linkedin.com/in/yoav-trachtman-cohen/",
+        "https://yoav-tc.itch.io/"
+    };
+
+    private IEnumerator GetAboutPageCoroutine()
+    {
+        foreach (var url in possibleAboutUrls)
+        {
+            Debug.Log($"Iterating over {url}...");
+            using (UnityWebRequest unityWebRequest = UnityWebRequest.Get(url))
+            {
+                yield return unityWebRequest.SendWebRequest();
+                
+                Debug.Log($"result {unityWebRequest.result}!");
+                if (unityWebRequest.result == UnityWebRequest.Result.Success)
+                {
+                    Application.OpenURL(url);
+                    yield break;
+                }
+            }
+
+            yield return null;
+        }
+    }
+
+    public void OnHowToPlayButtonPressed()
+    {
+        howToPlayPopup.DOKill();
+        howToPlayPopup.DOAnchorPosX(0, 1f);
+        
+        tutorialVideoPlayer.Play();
+    }
+
+    public void OnHowToPlayCloseButtonPressed()
+    {
+        howToPlayPopup.DOKill();
+        howToPlayPopup.DOAnchorPosX(-700, 0.5f).OnComplete(() =>
+        {
+            tutorialVideoPlayer.Stop();
+        });
+    }
+
+    #endregion
 }
