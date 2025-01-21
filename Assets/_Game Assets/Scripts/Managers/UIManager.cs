@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour, ITurnPerformListener
 {
     [Header("Components")] 
     [SerializeField] private DragAndDropHandler dragAndDropHandler;
+    [SerializeField] private GameOverScreenHandler gameOverScreenHandler;
     
     [Header("Toolbar UI Elements")]
     [SerializeField] private Button lockButton;
@@ -118,4 +119,9 @@ public class UIManager : MonoBehaviour, ITurnPerformListener
     }
 
     #endregion
+
+    public void ShowGameOverScreen(bool playerWon)
+    {
+        gameOverScreenHandler.Show(playerWon);
+    }
 }

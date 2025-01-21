@@ -246,11 +246,13 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
         
         toBeDestroyedPieces.Clear();
 
-        StartCoroutine(piecesManager.CheckWinOrLose(OnPlayerLostCallback));
+        StartCoroutine(piecesManager.CheckWinOrLose(OnPlayerLostCallback, 0.5f));
     }
 
     private void OnPlayerLostCallback(CircleTeam loser)
     {
+        CircleTeam myTeam = IsHost ? CircleTeam.BLACK : CircleTeam.WHITE;
+        uiManager.ShowGameOverScreen(loser != myTeam);
         Debug.Log($"{loser} lost!");
     }
     #endregion

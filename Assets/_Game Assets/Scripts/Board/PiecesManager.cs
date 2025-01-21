@@ -68,11 +68,13 @@ public class PiecesManager : MonoBehaviour
         }
     }
 
-    public IEnumerator CheckWinOrLose(Action<CircleTeam> loser)
+    public IEnumerator CheckWinOrLose(Action<CircleTeam> loser, float callbackDelay)
     {
         // Wait for Destroy call to finish
         yield return new WaitForEndOfFrame();
         RemoveMissingPieces();
+
+        yield return new WaitForSeconds(callbackDelay);
         
         if (blackCircles.Count <= 1) loser(CircleTeam.BLACK);
         if (whiteCircles.Count <= 1) loser(CircleTeam.WHITE);
