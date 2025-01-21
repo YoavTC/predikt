@@ -27,8 +27,8 @@ public class GameNetworkPanelsManager : MonoBehaviour
         
         yield return new WaitUntil(() => NetworkManager.Singleton != null);
     }
-
-    public void ClientConnectedCallback(ulong clientId)
+    
+    public void ClientConnectedCallback()
     {
         EventSystem.current.SetSelectedGameObject(null);
         
@@ -37,7 +37,7 @@ public class GameNetworkPanelsManager : MonoBehaviour
         CameraEnterGameFrame();
     }
     
-    public void ClientDisconnectedCallback(ulong clientId)
+    public void ClientDisconnectedCallback()
     {
         EventSystem.current.SetSelectedGameObject(null);
         

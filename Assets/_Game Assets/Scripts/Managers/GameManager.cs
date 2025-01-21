@@ -27,6 +27,7 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
         
         NetworkManager.Singleton.OnClientConnectedCallback += ClientConnectedCallback;
         NetworkManager.Singleton.OnClientDisconnectCallback += ClientDisconnectedCallback;
+        NetworkManager.Singleton.OnServerStopped += b => ClientDisconnectedCallback(0);
     }
     
     #region Initializations
@@ -50,17 +51,12 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
     private void ClientDisconnectedCallback(ulong clientId)
     {
         ClientDisconnectedUnityEvent?.Invoke(clientId);
-        if (clientId == NetworkManager.Singleton.LocalClientId)
-        {
-            LocalClientDisconnectedUnityEvent?.Invoke(clientId);
-        }
     }
     
     [Header("Network Events")]
     public UnityEvent<ulong> ClientConnectedUnityEvent;
     public UnityEvent<ulong> ClientDisconnectedUnityEvent;
     
-    public UnityEvent<ulong> LocalClientDisconnectedUnityEvent;
     public UnityEvent<ulong> LocalClientConnectedUnityEvent;
 
     public UnityEvent GameStartedUnityEvent;

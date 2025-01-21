@@ -2,6 +2,7 @@ using System;
 using DG.Tweening;
 using NaughtyAttributes;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -52,6 +53,11 @@ public class GameOverScreenHandler : MonoBehaviour
     public void OnMainMenuButtonPressed()
     {
         Hide();
+        NetworkManager.Singleton.Shutdown();
+        // if (NetworkManager.Singleton.IsHost)
+        // {
+        //     NetworkManager.Singleton.Shutdown();
+        // } else NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.LocalClientId);
     }
 
     public void OnRematchButtonPressed()
