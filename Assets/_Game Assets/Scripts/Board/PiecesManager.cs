@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
@@ -10,8 +12,8 @@ public class PiecesManager : MonoBehaviour
     
     [SerializeField] private Transform circlesParent;
 
-    private List<Circle> blackCircles = new List<Circle>();
-    private List<Circle> whiteCircles = new List<Circle>();
+    [SerializeField] private List<Circle> blackCircles = new List<Circle>();
+    [SerializeField] private List<Circle> whiteCircles = new List<Circle>();
     
     public void GetPieces()
     {
@@ -64,5 +66,21 @@ public class PiecesManager : MonoBehaviour
                 circle.DisableCollider();
             }
         }
+    }
+
+    public IEnumerator CheckWinOrLose(Action<CircleTeam> loser)
+    {
+        // Wait for Destroy call to finish
+        yield return new WaitForEndOfFrame();
+        RemoveMissingPieces();
+        
+        if (blackCircles.Count <= 1) loser(CircleTeam.BLACK);
+        if (whiteCircles.Count <= 1) loser(CircleTeam.WHITE);
+    }
+    
+    private void RemoveMissingPieces()
+    {
+        blackCircles.RemoveAll(item => item == null);
+        whiteCircles.RemoveAll(item => item == null);
     }
 }

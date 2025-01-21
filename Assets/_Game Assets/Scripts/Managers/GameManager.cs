@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -237,14 +238,20 @@ public class GameManager : NetworkSingleton<GameManager>, ITurnPerformListener
 
     private void DestroyPieces()
     {
-        Debug.Log("HETY");
-        foreach (var VARIABLE in toBeDestroyedPieces)
+        foreach (GameObject piece in toBeDestroyedPieces)
         {
-            Debug.Log($"Destroying {VARIABLE}");
-            Destroy(VARIABLE);
+            Debug.Log($"Destroying {piece}");
+            Destroy(piece);
         }
         
         toBeDestroyedPieces.Clear();
+
+        StartCoroutine(piecesManager.CheckWinOrLose(OnPlayerLostCallback));
+    }
+
+    private void OnPlayerLostCallback(CircleTeam loser)
+    {
+        Debug.Log($"{loser} lost!");
     }
     #endregion
 
