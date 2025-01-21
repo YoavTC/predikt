@@ -11553,7 +11553,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '1 .Lock your move
+  m_text: '1. Lock your move
 
     2. Opponent locks their move
 
